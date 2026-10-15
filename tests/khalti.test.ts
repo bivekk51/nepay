@@ -173,8 +173,7 @@ describe("khalti", () => {
     ).resolves.toMatchObject({ status: "failed" });
   });
 
-  it("lookup parses JSON body even on HTTP 400 and honours baseUrl override", async () => {
-    const raw = { pidx: "p", total_amount: 1000, status: "Expired", transaction_id: null };
+  it("lookup parses JSON body even on HTTP 400 and honours baseUrl override", async () => {    const raw = { pidx: "p", total_amount: 1000, status: "Expired", transaction_id: null };
     const fetchMock = stubFetch(raw, false, 400);
     const res = await lookupKhalti({
       config: { ...config, baseUrl: "https://example.test/api/v2" },
@@ -183,5 +182,32 @@ describe("khalti", () => {
     expect(res.status).toBe("Expired");
     const [url] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://example.test/api/v2/epayment/lookup/");
+  });
+
+  it("throws a descriptive Error on a malformed 200 initiate body", async () => {
+    const baseOpts = {
+      config,
+      purchaseOrderId: "ORDER-1",
+      purchaseOrderName: "Test order",
+      amountPaisa: 10000,
+    } as const;
+    // Missing pidx.
+    stubFetch({
+      payment_url: "https://pay.khalti.com/?pidx=pidx-123",
+      expires_at: "2026-01-01T00:00:00Z",
+      expires_in: 3600,
+    });
+    await expect(initiateKhalti({ ...baseOpts })).rejects.toThrow(/malformed pidx/);
+    // Empty payment_url.
+    stubFetch({ pidx: "pidx-123", payment_url: "", expires_at: "x", expires_in: 3600 });
+    await expect(initiateKhalti({ ...baseOpts })).rejects.toThrow(/malformed payment_url/);
+    // Non-finite expires_in (string instead of number).
+    stubFetch({
+      pidx: "pidx-123",
+      payment_url: "https://pay.khalti.com/?pidx=pidx-123",
+      expires_at: "2026-01-01T00:00:00Z",
+      expires_in: "3600",
+    });
+    await expect(initiateKhalti({ ...baseOpts })).rejects.toThrow(/malformed expires_in/);
   });
 });

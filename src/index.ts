@@ -12,6 +12,23 @@ import {
 } from "./khalti.js";
 
 export type { PaymentStatus, PaymentResult } from "./types.js";
+export type {
+  EsewaConfig,
+  EpayV2SignParams,
+  EpayStatusOpts,
+  EpayStatusResult,
+  EsewaFieldOpts,
+  VerifyEsewaPaymentOpts,
+} from "./esewa.js";
+export type {
+  KhaltiConfig,
+  KhaltiAmountBreakdown,
+  InitiateKhaltiOpts,
+  InitiateKhaltiResult,
+  LookupKhaltiOpts,
+  LookupKhaltiResult,
+  VerifyKhaltiPaymentOpts,
+} from "./khalti.js";
 export { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "./money.js";
 export {
   signEpayV2,

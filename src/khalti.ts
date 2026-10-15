@@ -135,11 +135,23 @@ export async function initiateKhalti(opts: InitiateKhaltiOpts): Promise<Initiate
     throw new Error(`Khalti initiate failed (HTTP ${res.status}): ${detail}`);
   }
   const rec = (raw ?? {}) as Record<string, unknown>;
+  const pidx = rec.pidx;
+  const paymentUrl = rec.payment_url;
+  const expiresIn = rec.expires_in;
+  if (typeof pidx !== "string" || pidx.length === 0) {
+    throw new Error(`Khalti initiate returned malformed pidx: ${JSON.stringify(raw)}`);
+  }
+  if (typeof paymentUrl !== "string" || paymentUrl.length === 0) {
+    throw new Error(`Khalti initiate returned malformed payment_url: ${JSON.stringify(raw)}`);
+  }
+  if (typeof expiresIn !== "number" || !Number.isFinite(expiresIn)) {
+    throw new Error(`Khalti initiate returned malformed expires_in: ${JSON.stringify(raw)}`);
+  }
   return {
-    pidx: String(rec.pidx),
-    payment_url: String(rec.payment_url),
+    pidx,
+    payment_url: paymentUrl,
     expires_at: String(rec.expires_at),
-    expires_in: Number(rec.expires_in),
+    expires_in: expiresIn,
   };
 }
 

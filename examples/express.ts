@@ -5,6 +5,8 @@
  *   `req.query.data ?? req.body.data`.
  * - Khalti return: `pidx` arrives as a `?pidx=` query param.
  * - Secrets come from env vars; only fulfil on `status === "completed"`.
+ * - `verifyPayment` THROWS for eSewa mismatches (and on transport errors for
+ *   both providers), so every verify handler MUST try/catch — see below.
  */
 import type { Request, Response } from "express";
 import { initiatePayment, verifyPayment } from "../src/index.js";
@@ -24,12 +26,37 @@ const khaltiConfig = {
   env: "sandbox" as const,
 };
 
+/** Query values can be string | string[] | object — take the plain-string case. */
+function queryString(req: Request, name: string): string {
+  const v = req.query[name];
+  return typeof v === "string" ? v : "";
+}
+
+function bodyField(req: Request, name: string): unknown {
+  const body: unknown = req.body;
+  if (body !== null && typeof body === "object" && name in body) {
+    return (body as Record<string, unknown>)[name];
+  }
+  return undefined;
+}
+
+function stringField(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
 export async function startEsewa(req: Request, res: Response): Promise<void> {
-  const { url, fields } = (await initiatePayment({
+  const initiated = await initiatePayment({
     method: "esewa",
     config: esewaConfig,
-    order: { orderId: String(req.body.orderId), amountPaisa: Number(req.body.amountPaisa) },
-  })) as { url: string; fields: Record<string, string> };
+    order: {
+      orderId: stringField(bodyField(req, "orderId")),
+      amountPaisa: Number(bodyField(req, "amountPaisa")),
+    },
+  });
+  if (!("url" in initiated)) {
+    throw new Error("unexpected initiate result for method esewa");
+  }
+  const { url, fields } = initiated;
   const inputs = Object.entries(fields)
     .map(([k, v]) => `<input type="hidden" name="${k}" value="${v}"/>`)
     .join("");
@@ -38,43 +65,57 @@ export async function startEsewa(req: Request, res: Response): Promise<void> {
 
 export async function esewaCallback(req: Request, res: Response): Promise<void> {
   // eSewa sends GET in some envs, POST in others.
-  const data = (req.query.data ?? req.body.data) as string;
-  const result = await verifyPayment({
-    method: "esewa",
-    config: esewaConfig,
-    data,
-    expectedOrderId: String(req.query.orderId ?? req.body.orderId),
-    expectedAmountPaisa: Number(req.query.amountPaisa ?? req.body.amountPaisa),
-  });
-  if (result.status === "completed") {
-    // TODO: fulfil the order exactly once (idempotent on orderId).
+  const raw = req.query.data ?? bodyField(req, "data");
+  const data = stringField(raw);
+  try {
+    const result = await verifyPayment({
+      method: "esewa",
+      config: esewaConfig,
+      data,
+      expectedOrderId: queryString(req, "orderId") || stringField(bodyField(req, "orderId")),
+      expectedAmountPaisa: Number(req.query.amountPaisa ?? bodyField(req, "amountPaisa")),
+    });
+    if (result.status === "completed") {
+      // TODO: fulfil the order exactly once (idempotent on orderId).
+    }
+    res.json({ status: result.status });
+  } catch (err) {
+    // eSewa verify THROWS on bad signature / order / amount mismatch.
+    res.status(400).json({ status: "failed", error: (err as Error).message });
   }
-  res.json({ status: result.status });
 }
 
 export async function startKhalti(req: Request, res: Response): Promise<void> {
-  const { payment_url } = (await initiatePayment({
+  const initiated = await initiatePayment({
     method: "khalti",
     config: khaltiConfig,
     order: {
-      purchaseOrderId: String(req.body.orderId),
-      purchaseOrderName: String(req.body.orderName),
-      amountPaisa: Number(req.body.amountPaisa),
+      purchaseOrderId: stringField(bodyField(req, "orderId")),
+      purchaseOrderName: stringField(bodyField(req, "orderName")),
+      amountPaisa: Number(bodyField(req, "amountPaisa")),
     },
-  })) as { pidx: string; payment_url: string };
-  res.redirect(payment_url);
+  });
+  if (!("pidx" in initiated)) {
+    throw new Error("unexpected initiate result for method khalti");
+  }
+  res.redirect(initiated.payment_url);
 }
 
 export async function khaltiReturn(req: Request, res: Response): Promise<void> {
-  const pidx = String(req.query.pidx ?? "");
-  const result = await verifyPayment({
-    method: "khalti",
-    config: khaltiConfig,
-    pidx,
-    expectedAmountPaisa: Number(req.query.amountPaisa),
-  });
-  if (result.status === "completed") {
-    // TODO: fulfil the order exactly once (idempotent on orderId).
+  const pidx = queryString(req, "pidx");
+  try {
+    const result = await verifyPayment({
+      method: "khalti",
+      config: khaltiConfig,
+      pidx,
+      expectedAmountPaisa: Number(req.query.amountPaisa),
+    });
+    if (result.status === "completed") {
+      // TODO: fulfil the order exactly once (idempotent on orderId).
+    }
+    res.json({ status: result.status });
+  } catch (err) {
+    // Khalti verify throws only on transport/unparseable errors.
+    res.status(502).json({ status: "failed", error: (err as Error).message });
   }
-  res.json({ status: result.status });
 }

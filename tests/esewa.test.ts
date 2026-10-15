@@ -334,4 +334,28 @@ describe("esewa callback normalize", () => {
       })
     ).rejects.toThrow();
   });
+
+  it("sends comma-free total_amount to the status check for comma-formatted callbacks", async () => {
+    const data = signedCallbackData({
+      total_amount: "1,112.50",
+      transaction_uuid: "11-201-13",
+      product_code: "EPAYTEST",
+    });
+    const fetchMock = vi.fn(async (input: string | URL | Request): Promise<Response> => {
+      void input;
+      return { json: async () => ({ status: "COMPLETE", ref_id: "ref-9" }) } as Response;
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const res = await verifyEsewaPayment({
+      config: sandboxCfg,
+      data,
+      expectedOrderId: "11-201-13",
+      expectedAmountPaisa: 111250,
+    });
+    expect(res.status).toBe("completed");
+    const calledUrl = String(fetchMock.mock.calls[0][0]);
+    expect(calledUrl).toContain("total_amount=1112.50");
+    expect(calledUrl).not.toContain(",");
+    expect(calledUrl).not.toContain("%2C");
+  });
 });

@@ -220,7 +220,10 @@ export async function verifyEsewaPayment(opts: VerifyEsewaPaymentOpts): Promise<
   const live = await checkEpayStatus({
     env: opts.config.env,
     product_code: productCode,
-    total_amount: totalRaw,
+    // Status endpoint wants a plain decimal; callback `total_amount` may be
+    // comma-formatted (e.g. "1,112.50"). Signature verification above already
+    // used the raw string verbatim — only normalize here.
+    total_amount: totalRaw.replace(/,/g, ""),
     transaction_uuid: uuid,
   });
   const statusRaw = (live.raw ?? {}) as Record<string, unknown>;

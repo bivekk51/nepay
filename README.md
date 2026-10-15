@@ -72,11 +72,42 @@ Only fulfil a Khalti order when `verifyPayment` returns `status: "completed"` �
 ```ts
 import { initiatePayment, verifyPayment } from "unified-nepal-payments";
 
-// eSewa form fields
-const { url, fields } = await initiatePayment({ method: "esewa", config: esewaConfig, order: { orderId, amountPaisa } });
+// eSewa form fields — initiatePayment returns a union, so narrow it:
+const esewa = await initiatePayment({ method: "esewa", config: esewaConfig, order: { orderId, amountPaisa } });
+if (!("url" in esewa)) throw new Error("unexpected initiate result");
+const { url, fields } = esewa;
 
-// Khalti payment page
-const { pidx, payment_url } = await initiatePayment({ method: "khalti", config: khaltiConfig, order: { purchaseOrderId, purchaseOrderName, amountPaisa } });
+// Khalti payment page — narrow the other branch:
+const khalti = await initiatePayment({ method: "khalti", config: khaltiConfig, order: { purchaseOrderId, purchaseOrderName, amountPaisa } });
+if (!("pidx" in khalti)) throw new Error("unexpected initiate result");
+const { pidx, payment_url } = khalti;
+```
+
+## Verify contract: throw vs `failed` (callers MUST try/catch `verifyPayment`)
+
+The two providers report verification problems differently — this is intentional,
+documented here so callers handle both:
+
+- **eSewa** — `verifyEsewaPayment` / `verifyPayment({ method: "esewa", ... })` **THROWS** on
+  undecodable `data`, an invalid callback signature, and on `product_code` /
+  `transaction_uuid` / `total_amount` mismatch. Transport-level status-check outages
+  throw `EsewaRetryableError` (retry later). A returned `PaymentResult` therefore
+  only ever carries `completed` / `pending` / `failed` for live gateway states.
+- **Khalti** — `verifyKhaltiPayment` / `verifyPayment({ method: "khalti", ... })` **RETURNS
+  `{ status: "failed" }`** on amount or order-id mismatch (refunds also map to
+  `failed`); it **throws only** on transport errors or unparseable lookup bodies.
+
+Consequence: always wrap `verifyPayment` in try/catch, regardless of method:
+
+```ts
+try {
+  const result = await verifyPayment({ method: "esewa", config: esewaConfig, data, expectedOrderId: orderId, expectedAmountPaisa: totalPaisa });
+  if (result.status === "completed") {
+    // fulfil exactly once (idempotent on orderId)
+  }
+} catch (err) {
+  // eSewa mismatch / invalid signature, or transport failure for either provider
+}
 ```
 
 See `examples/express.ts` and `examples/nextjs-server-action.ts` (illustrations only — no live calls).
