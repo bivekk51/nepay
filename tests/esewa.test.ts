@@ -2,9 +2,12 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import {
   signEpayV2,
   verifyEpayCallback,
+  verifyEsewaPayment,
+  buildEsewaFields,
   checkEpayStatus,
   EsewaRetryableError,
   ESEWA_BASES,
+  type EsewaConfig,
 } from "../src/esewa.js";
 import { parseAmountToPaisa } from "../src/money.js";
 
@@ -142,5 +145,193 @@ describe("esewa status check", () => {
       baseUrl: "https://example.test/status/",
     });
     expect(String(fetchMock.mock.calls[0][0]).startsWith("https://example.test/status/")).toBe(true);
+  });
+});
+
+const sandboxCfg: EsewaConfig = {
+  productCode: "EPAYTEST",
+  secretKey: SECRET,
+  successUrl: "https://example.com/success",
+  failureUrl: "https://example.com/failure",
+  env: "sandbox",
+};
+
+function signedCallbackData(fields: {
+  total_amount: string;
+  transaction_uuid: string;
+  product_code: string;
+}): string {
+  const signature = signEpayV2(fields, SECRET);
+  return b64({
+    ...fields,
+    signed_field_names: "total_amount,transaction_uuid,product_code",
+    signature,
+  });
+}
+
+/** eSewa redirects with `data` via GET in some envs and POST in others. */
+function extractData(req: { query?: { data?: string }; body?: { data?: string } }): string {
+  return req.query?.data ?? req.body?.data ?? "";
+}
+
+function stubStatusFetch(raw: unknown) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => ({ json: async () => raw }) as Response)
+  );
+}
+
+describe("esewa initiate fields", () => {
+  it("builds v2 fields with total=sum and signed_field_names order", () => {
+    const { url, fields } = buildEsewaFields({
+      config: sandboxCfg,
+      orderId: "11-201-13",
+      amountPaisa: 10000,
+      taxPaisa: 0,
+      servicePaisa: 0,
+      deliveryPaisa: 0,
+    });
+    expect(url).toBe("https://rc-epay.esewa.com.np/api/epay/main/v2/form");
+    expect(fields.signed_field_names).toBe("total_amount,transaction_uuid,product_code");
+    expect(fields.total_amount).toBe("100");
+  });
+
+  it("sums amount+tax+service+delivery into total_amount", () => {
+    const { fields } = buildEsewaFields({
+      config: sandboxCfg,
+      orderId: "ORDER-1",
+      amountPaisa: 10000,
+      taxPaisa: 1000,
+      servicePaisa: 200,
+      deliveryPaisa: 50,
+    });
+    expect(fields.total_amount).toBe("112.5");
+    expect(fields.transaction_uuid).toBe("ORDER-1");
+    expect(fields.product_code).toBe("EPAYTEST");
+  });
+
+  it("rejects orderIds outside [A-Za-z0-9-]", () => {
+    expect(() =>
+      buildEsewaFields({ config: sandboxCfg, orderId: "bad/id?", amountPaisa: 100 })
+    ).toThrow();
+  });
+});
+
+describe("esewa callback normalize", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("accepts data from GET query or POST body identically", async () => {
+    const data = signedCallbackData({
+      total_amount: "100",
+      transaction_uuid: "11-201-13",
+      product_code: "EPAYTEST",
+    });
+    stubStatusFetch({ status: "COMPLETE", ref_id: "ref-1" });
+
+    const fromGet = extractData({ query: { data } });
+    const getRes = await verifyEsewaPayment({
+      config: sandboxCfg,
+      data: fromGet,
+      expectedOrderId: "11-201-13",
+      expectedAmountPaisa: 10000,
+    });
+
+    const fromPost = extractData({ body: { data } });
+    const postRes = await verifyEsewaPayment({
+      config: sandboxCfg,
+      data: fromPost,
+      expectedOrderId: "11-201-13",
+      expectedAmountPaisa: 10000,
+    });
+
+    expect(fromGet).toBe(fromPost);
+    expect(postRes).toEqual(getRes);
+    expect(getRes.status).toBe("completed");
+    expect(getRes.traceId).toBe("ref-1");
+  });
+
+  it("keeps PENDING (e.g. from failure_url) as pending, never failed", async () => {
+    const data = signedCallbackData({
+      total_amount: "100",
+      transaction_uuid: "11-201-13",
+      product_code: "EPAYTEST",
+    });
+    stubStatusFetch({ status: "PENDING", ref_id: null });
+    const res = await verifyEsewaPayment({
+      config: sandboxCfg,
+      data,
+      expectedOrderId: "11-201-13",
+      expectedAmountPaisa: 10000,
+    });
+    expect(res.status).toBe("pending");
+  });
+
+  it("maps AMBIGUOUS to pending and CANCELED to failed", async () => {
+    const data = signedCallbackData({
+      total_amount: "100",
+      transaction_uuid: "11-201-13",
+      product_code: "EPAYTEST",
+    });
+    stubStatusFetch({ status: "AMBIGUOUS", ref_id: null });
+    await expect(
+      verifyEsewaPayment({
+        config: sandboxCfg,
+        data,
+        expectedOrderId: "11-201-13",
+        expectedAmountPaisa: 10000,
+      })
+    ).resolves.toMatchObject({ status: "pending" });
+
+    stubStatusFetch({ status: "CANCELED", ref_id: null, transaction_code: "tx-9" });
+    await expect(
+      verifyEsewaPayment({
+        config: sandboxCfg,
+        data,
+        expectedOrderId: "11-201-13",
+        expectedAmountPaisa: 10000,
+      })
+    ).resolves.toMatchObject({ status: "failed", traceId: "tx-9" });
+  });
+
+  it("rejects tampered signatures and mismatched order/amount", async () => {
+    const good = signedCallbackData({
+      total_amount: "100",
+      transaction_uuid: "11-201-13",
+      product_code: "EPAYTEST",
+    });
+    stubStatusFetch({ status: "COMPLETE", ref_id: "ref-1" });
+    await expect(
+      verifyEsewaPayment({
+        config: sandboxCfg,
+        data: good,
+        expectedOrderId: "other-id",
+        expectedAmountPaisa: 10000,
+      })
+    ).rejects.toThrow();
+    await expect(
+      verifyEsewaPayment({
+        config: sandboxCfg,
+        data: good,
+        expectedOrderId: "11-201-13",
+        expectedAmountPaisa: 9999,
+      })
+    ).rejects.toThrow();
+    const tampered = b64({
+      total_amount: "100",
+      transaction_uuid: "11-201-13",
+      product_code: "EPAYTEST",
+      signed_field_names: "total_amount,transaction_uuid,product_code",
+      signature: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    });
+    await expect(
+      verifyEsewaPayment({
+        config: sandboxCfg,
+        data: tampered,
+        expectedOrderId: "11-201-13",
+        expectedAmountPaisa: 10000,
+      })
+    ).rejects.toThrow();
   });
 });
