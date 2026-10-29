@@ -21,6 +21,9 @@ export default defineConfig({
 				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
 			],
 			customCss: ['./src/styles/custom.css'],
+			components: {
+				ThemeSelect: './src/components/ThemeSelect.astro',
+			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bivekk51/nepay' }
 			],
