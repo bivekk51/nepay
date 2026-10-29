@@ -34,7 +34,6 @@ export default defineConfig({
 						{ label: 'Overview', slug: 'index' },
 						{ label: 'Installation', slug: 'getting-started/installation' },
 						{ label: 'Quick Start', slug: 'getting-started/quickstart' },
-						{ label: 'Brand & Logo Identity', slug: 'brand' },
 					],
 				},
 				{
