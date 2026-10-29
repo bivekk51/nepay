@@ -1,7 +1,28 @@
 # unified-nepal-payments
 
-Unified server-side SDK for Nepal payments: **eSewa (ePay v2)** + **Khalti (ePayment v2)** behind one
-zod-discriminated `initiatePayment` / `verifyPayment` surface. All amounts are **integer paisa**.
+[![npm version](https://img.shields.io/npm/v/unified-nepal-payments.svg)](https://www.npmjs.com/package/unified-nepal-payments)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](tsconfig.json)
+
+Unified server-side TypeScript SDK for Nepal payment gateways: **eSewa (ePay v2)** + **Khalti (ePayment v2)** behind a single, typesafe, zod-discriminated `initiatePayment` / `verifyPayment` surface.
+
+All monetary amounts are strictly **integer paisa** ($1\text{ NPR} = 100\text{ paisa}$) to eliminate floating-point rounding bugs.
+
+📖 **[Full Documentation & Guides](https://unified-nepal-payments.dev)** (or run `npm run docs:dev` locally)
+
+---
+
+## Features
+
+- 🔒 **Zero Browser Leaks**: Designed exclusively for backend environments (Express, Next.js Server Actions, Remix, Fastify). Secrets are never logged or exposed.
+- ⚡ **Single Mental Model**: One `initiatePayment()` and one `verifyPayment()` function discriminated by `method: 'esewa' | 'khalti'`.
+- 💰 **Paisa-Safe Arithmetic**: All amounts are integer paisa with built-in conversion utilities (`nprToPaisa`, `paisaToRupeesString`, `parseAmountToPaisa`).
+- 🛡️ **Mandatory S2S Verification**: Eliminates trust in client redirects. Always verifies status server-to-server before marking orders `completed`.
+- 🩺 **Resilient Error Handling**: Gracefully handles eSewa comma-formatted amounts (`"1,000.0"`), GET vs POST callback variances, Khalti HTTP 400 Expired bodies, and temporary gateway maintenance outages (`EsewaRetryableError`).
+- 📦 **Dual ESM & CommonJS**: Shipped with complete TypeScript `.d.ts` declaration files.
+
+---
 
 ## Install
 
@@ -9,7 +30,7 @@ zod-discriminated `initiatePayment` / `verifyPayment` surface. All amounts are *
 npm install unified-nepal-payments
 ```
 
-Requires Node >= 18 (global `fetch`).
+Requires Node >= 18 (global `fetch` and `node:crypto`).
 
 ## ⚠️ Server-only warning
 
@@ -111,3 +132,68 @@ try {
 ```
 
 See `examples/express.ts` and `examples/nextjs-server-action.ts` (illustrations only — no live calls).
+
+## Sandbox Credentials & Environment Setup
+
+Copy `.env.example` to `.env` to configure credentials:
+
+```bash
+cp .env.example .env
+```
+
+### Environment Variables (.env)
+
+```env
+# eSewa Sandbox
+ESEWA_PRODUCT_CODE="EPAYTEST"
+ESEWA_SECRET_KEY="8gBm/:&EnhH.1/q"
+ESEWA_SUCCESS_URL="https://example.com/payments/esewa/callback"
+ESEWA_FAILURE_URL="https://example.com/payments/esewa/callback"
+ESEWA_ENV="sandbox"
+
+# Khalti Sandbox (obtain from https://test-admin.khalti.com/#/join/merchant)
+KHALTI_SECRET_KEY="your-khalti-sandbox-secret-key"
+KHALTI_PUBLIC_KEY="your-khalti-sandbox-public-key"
+KHALTI_WEBSITE_URL="https://example.com"
+KHALTI_RETURN_URL="https://example.com/payments/khalti/return"
+KHALTI_ENV="sandbox"
+```
+
+### Sandbox Test Credentials
+
+#### eSewa (UAT)
+- **Product Code**: `EPAYTEST`
+- **Secret Key**: `8gBm/:&EnhH.1/q`
+- **Customer Test Wallet**: `9806800001` - `9806800005`
+- **Password**: `Nepal@123`
+- **MPIN**: `1122`
+- **OTP**: `123456`
+
+#### Khalti (Sandbox)
+- **Merchant Sandbox Keys**: Create a free merchant test account at [Khalti Test Merchant Admin](https://test-admin.khalti.com/#/join/merchant) and navigate to **Keys** to copy your test Secret Key (`live_secret_key` or `test_secret_key`).
+- **Customer Test Wallet**: `9800000000` - `9800000005`
+- **MPIN**: `1111`
+- **OTP**: `987654`
+
+## Running Tests
+
+- **Unit tests (offline, mocked)**:
+  ```bash
+  npm test
+  ```
+- **Live gateway integration tests (hits real eSewa UAT and Khalti sandbox APIs)**:
+  ```bash
+  npm run test:live
+  ```
+- **Build & typecheck**:
+  ```bash
+  npm run build
+  npm run typecheck
+  ```
+- **Documentation site (Astro Starlight)**:
+  ```bash
+  npm run docs:dev    # Start local docs server at http://localhost:4321
+  npm run docs:build  # Build production static documentation
+  ```
+
+
