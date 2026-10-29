@@ -1,0 +1,594 @@
+/* ==========================================================================
+   Unified Nepal Payments Documentation Theme
+   Design System Reference: Resend (https://resend.com/docs/introduction)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* --------------------------------------------------------------------------
+   Design Tokens - Dark Theme (Default)
+   -------------------------------------------------------------------------- */
+:root {
+	/* Typography */
+	--sl-font-system: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	--sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+	/* Resend Dark Palette */
+	--sl-color-bg: #0a0a0c;
+	--sl-color-bg-nav: #0a0a0c;
+	--sl-color-bg-sidebar: #0a0a0c;
+	--sl-color-bg-inline-code: #17181c;
+
+	--sl-color-hairline: #1c1d22;
+	--sl-color-hairline-light: #16171b;
+
+	--sl-color-text: #ebecee;
+	--sl-color-text-accent: #ffffff;
+	--sl-color-text-invert: #0a0a0c;
+
+	--sl-color-gray-1: #ffffff; /* Primary headings */
+	--sl-color-gray-2: #d4d4d8; /* Body text */
+	--sl-color-gray-3: #a1a1aa; /* Secondary labels */
+	--sl-color-gray-4: #71717a; /* Muted text / TOC inactive */
+	--sl-color-gray-5: #1f2026; /* Subtle borders */
+	--sl-color-gray-6: #111216; /* Surfaces */
+
+	/* Accents */
+	--sl-color-accent: #ffffff;
+	--sl-color-accent-high: #ffffff;
+	--sl-color-accent-low: rgba(255, 255, 255, 0.08);
+
+	/* Layout metrics */
+	--sl-sidebar-width: 250px;
+	--sl-content-width: 48rem; /* ~768px reading width */
+
+	/* Resend Sleek Tokens - Dark */
+	--theme-sidebar-hover: rgba(255, 255, 255, 0.04);
+	--theme-sidebar-active-bg: rgba(255, 255, 255, 0.08);
+	--theme-sidebar-active-text: #ffffff;
+
+	--theme-toc-active-line: #ffffff;
+	--theme-toc-active-text: #ffffff;
+
+	--theme-surface-card: #0e0f14;
+	--theme-surface-card-border: #1c1d22;
+	--theme-surface-card-hover: #2a2c34;
+
+	--theme-code-bg: #0e0f14;
+	--theme-code-border: #1c1d22;
+
+	--theme-badge-bg: #16171c;
+	--theme-badge-border: #22242b;
+	--theme-badge-text: #d4d4d8;
+}
+
+/* --------------------------------------------------------------------------
+   Design Tokens - Light Theme
+   -------------------------------------------------------------------------- */
+:root[data-theme='light'] {
+	/* Resend Light Palette */
+	--sl-color-bg: #ffffff;
+	--sl-color-bg-nav: #ffffff;
+	--sl-color-bg-sidebar: #ffffff;
+	--sl-color-bg-inline-code: #f3f4f6;
+
+	--sl-color-hairline: #eaeaea;
+	--sl-color-hairline-light: #f3f4f6;
+
+	--sl-color-text: #171717;
+	--sl-color-text-accent: #000000;
+	--sl-color-text-invert: #ffffff;
+
+	--sl-color-gray-1: #000000; /* Primary headings */
+	--sl-color-gray-2: #374151; /* Body text */
+	--sl-color-gray-3: #6b7280; /* Secondary text */
+	--sl-color-gray-4: #9ca3af; /* Muted text / TOC inactive */
+	--sl-color-gray-5: #e5e7eb; /* Subtle borders */
+	--sl-color-gray-6: #f9fafb; /* Surfaces */
+
+	/* Accents */
+	--sl-color-accent: #000000;
+	--sl-color-accent-high: #171717;
+	--sl-color-accent-low: rgba(0, 0, 0, 0.06);
+
+	/* Resend Sleek Tokens - Light */
+	--theme-sidebar-hover: rgba(0, 0, 0, 0.04);
+	--theme-sidebar-active-bg: rgba(0, 0, 0, 0.06);
+	--theme-sidebar-active-text: #000000;
+
+	--theme-toc-active-line: #000000;
+	--theme-toc-active-text: #000000;
+
+	--theme-surface-card: #ffffff;
+	--theme-surface-card-border: #eaeaea;
+	--theme-surface-card-hover: #dcdcdc;
+
+	--theme-code-bg: #f9fafb;
+	--theme-code-border: #eaeaea;
+
+	--theme-badge-bg: #f3f4f6;
+	--theme-badge-border: #e5e7eb;
+	--theme-badge-text: #374151;
+}
+
+/* --------------------------------------------------------------------------
+   Global Layout & Minimal Resend Header
+   -------------------------------------------------------------------------- */
+header.header {
+	border-bottom: 1px solid var(--sl-color-hairline);
+	background: var(--sl-color-bg);
+	backdrop-filter: blur(12px);
+	height: 3.5rem;
+}
+
+.site-title {
+	font-weight: 600;
+	font-size: 0.925rem;
+	letter-spacing: -0.015em;
+	color: var(--sl-color-gray-1);
+}
+
+/* --------------------------------------------------------------------------
+   Left Sidebar Navigation (Resend Exact Style)
+   -------------------------------------------------------------------------- */
+#starlight__sidebar {
+	border-right: 1px solid var(--sl-color-hairline);
+	background: var(--sl-color-bg);
+	padding: 1.5rem 0.85rem;
+}
+
+/* Section Group Summary (e.g. "Start Here", "Core Concepts") */
+#starlight__sidebar summary {
+	font-size: 0.8125rem !important;
+	font-weight: 500 !important;
+	text-transform: none !important; /* Resend uses natural casing */
+	letter-spacing: normal !important;
+	color: var(--sl-color-gray-2) !important;
+	padding: 0.5rem 0.65rem 0.35rem 0.65rem !important;
+	cursor: pointer;
+	border-radius: 6px;
+	transition: color 0.12s;
+}
+
+#starlight__sidebar summary:hover {
+	color: var(--sl-color-gray-1) !important;
+}
+
+#starlight__sidebar summary .large,
+#starlight__sidebar .top-level > li > details > summary span {
+	font-size: 0.8125rem !important;
+	font-weight: 500 !important;
+	text-transform: none !important;
+	letter-spacing: normal !important;
+}
+
+#starlight__sidebar summary .caret {
+	color: var(--sl-color-gray-4);
+	opacity: 0.6;
+	transition: transform 0.2s ease;
+}
+
+/* Sidebar Navigation Links */
+#starlight__sidebar a {
+	font-size: 0.875rem !important; /* 14px */
+	line-height: 1.45 !important;
+	font-weight: 400 !important;
+	color: var(--sl-color-gray-3) !important;
+	border-radius: 8px !important;
+	padding: 0.38rem 0.75rem !important;
+	margin: 1px 0 !important;
+	border: 1px solid transparent !important;
+	text-decoration: none !important;
+	transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+#starlight__sidebar a:hover {
+	color: var(--sl-color-gray-1) !important;
+	background: var(--theme-sidebar-hover) !important;
+}
+
+/* Active Sidebar Link - Sleek Resend Neutral Pill */
+#starlight__sidebar a[aria-current='page'] {
+	color: var(--theme-sidebar-active-text) !important;
+	background: var(--theme-sidebar-active-bg) !important;
+	font-weight: 500 !important;
+	border: 1px solid transparent !important;
+}
+
+/* --------------------------------------------------------------------------
+   Right Bar: Table of Contents ("On this page") - Resend Exact Style
+   -------------------------------------------------------------------------- */
+.right-sidebar-container,
+.right-sidebar {
+	border: none !important;
+	border-left: none !important;
+	border-inline-start: none !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	padding-top: 1.5rem;
+}
+
+starlight-toc {
+	font-size: 0.875rem;
+}
+
+/* "On this page" Title with Resend 3-line icon */
+#starlight__on-this-page,
+starlight-toc h2 {
+	display: flex !important;
+	align-items: center !important;
+	font-size: 0.875rem !important; /* 14px */
+	font-weight: 500 !important;
+	text-transform: none !important;
+	letter-spacing: normal !important;
+	color: var(--sl-color-gray-2) !important;
+	margin: 0 0 0.85rem 0 !important;
+	padding: 0 !important;
+}
+
+#starlight__on-this-page::before,
+starlight-toc h2::before {
+	content: "";
+	display: inline-block;
+	width: 14px;
+	height: 12px;
+	background-color: var(--sl-color-gray-3);
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round'%3E%3Cline x1='2' y1='3.5' x2='14' y2='3.5'/%3E%3Cline x1='2' y1='8' x2='9' y2='8'/%3E%3Cline x1='2' y1='12.5' x2='13' y2='12.5'/%3E%3C/svg%3E") no-repeat center / contain;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round'%3E%3Cline x1='2' y1='3.5' x2='14' y2='3.5'/%3E%3Cline x1='2' y1='8' x2='9' y2='8'/%3E%3Cline x1='2' y1='12.5' x2='13' y2='12.5'/%3E%3C/svg%3E") no-repeat center / contain;
+	margin-right: 8px;
+	flex-shrink: 0;
+}
+
+/* Vertical guide line track on left of TOC */
+starlight-toc nav > ul {
+	border-left: none !important;
+	padding-left: 0 !important;
+	margin: 0 !important;
+	list-style: none !important;
+}
+
+starlight-toc nav > ul li {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+/* TOC Links - Pure straight border-left, zero border-radius, zero box-shadow */
+starlight-toc nav > ul li a {
+	display: block !important;
+	font-size: 0.875rem !important; /* 14px */
+	line-height: 1.5 !important;
+	padding: 4px 0 4px 16px !important;
+	margin: 0 !important;
+	color: var(--sl-color-gray-4) !important;
+	text-decoration: none !important;
+	border-left: 1px solid var(--sl-color-hairline) !important;
+	border-top: none !important;
+	border-right: none !important;
+	border-bottom: none !important;
+	border-radius: 0 !important; /* CRITICAL: removes any corner arc / bracket curvature */
+	box-shadow: none !important;
+	outline: none !important;
+	background: transparent !important;
+	transition: color 0.15s ease, border-color 0.15s ease !important;
+}
+
+starlight-toc nav > ul li a:hover {
+	color: var(--sl-color-gray-1) !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+/* Active Highlight Indicator - Straight razor-sharp vertical bar */
+starlight-toc nav > ul li a[aria-current='true'] {
+	color: var(--theme-toc-active-text) !important;
+	border-left: 1px solid var(--theme-toc-active-line) !important;
+	border-top: none !important;
+	border-right: none !important;
+	border-bottom: none !important;
+	border-radius: 0 !important; /* CRITICAL: Must be square ends */
+	font-weight: 500 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	outline: none !important;
+}
+
+starlight-toc nav > ul li a[aria-current='true'] span {
+	color: inherit !important;
+	font-weight: inherit !important;
+}
+
+/* Nested TOC levels */
+starlight-toc nav ul ul {
+	border-left: none !important;
+	padding-left: 0 !important;
+	margin: 0 !important;
+	list-style: none !important;
+}
+
+starlight-toc nav ul ul li a {
+	padding-left: 28px !important;
+}
+
+/* --------------------------------------------------------------------------
+   Typography & Main Content Flow
+   -------------------------------------------------------------------------- */
+.sl-markdown-content {
+	font-size: 0.95rem;
+	line-height: 1.7;
+	color: var(--sl-color-gray-2);
+}
+
+.sl-markdown-content h1 {
+	font-size: 1.95rem !important;
+	font-weight: 650;
+	letter-spacing: -0.03em;
+	color: var(--sl-color-gray-1);
+	margin-top: 0;
+	margin-bottom: 0.75rem;
+	line-height: 1.25;
+}
+
+.sl-markdown-content h2 {
+	font-size: 1.3rem !important;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: var(--sl-color-gray-1);
+	margin-top: 2.5rem !important;
+	margin-bottom: 0.85rem !important;
+	padding-bottom: 0.4rem;
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.sl-markdown-content h3 {
+	font-size: 1.08rem !important;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	color: var(--sl-color-gray-1);
+	margin-top: 1.75rem !important;
+	margin-bottom: 0.6rem !important;
+}
+
+.sl-markdown-content p,
+.sl-markdown-content ul,
+.sl-markdown-content ol {
+	margin-bottom: 1.25rem;
+}
+
+.sl-markdown-content strong {
+	font-weight: 600;
+	color: var(--sl-color-gray-1);
+}
+
+.sl-markdown-content a {
+	color: var(--sl-color-gray-1);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	text-decoration-thickness: 1px;
+	text-decoration-color: var(--sl-color-hairline);
+	transition: text-decoration-color 0.15s ease;
+}
+
+.sl-markdown-content a:hover {
+	text-decoration-color: var(--sl-color-gray-1);
+}
+
+/* --------------------------------------------------------------------------
+   Inline Code & Expressive Code Blocks
+   -------------------------------------------------------------------------- */
+.sl-markdown-content :not(pre) > code {
+	background: var(--sl-color-bg-inline-code);
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 5px;
+	padding: 0.15rem 0.38rem;
+	font-size: 0.85em;
+	font-family: var(--sl-font-mono);
+	color: var(--sl-color-gray-1);
+	font-weight: 500;
+}
+
+.expressive-code {
+	margin: 1.5rem 0 1.75rem 0 !important;
+}
+
+.expressive-code .frame {
+	border-radius: 8px !important;
+	border: 1px solid var(--theme-code-border) !important;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+	background: var(--theme-code-bg) !important;
+}
+
+.expressive-code .header {
+	background: var(--sl-color-bg) !important;
+	border-bottom: 1px solid var(--theme-code-border) !important;
+	font-family: var(--sl-font-mono) !important;
+	font-size: 0.78rem !important;
+	padding: 0.4rem 0.85rem !important;
+}
+
+.expressive-code pre {
+	font-size: 0.85rem !important;
+	line-height: 1.65 !important;
+	padding: 1rem 1.15rem !important;
+}
+
+/* --------------------------------------------------------------------------
+   Tables (Clean Minimalist Borders)
+   -------------------------------------------------------------------------- */
+.sl-markdown-content table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	margin: 1.5rem 0 2rem 0;
+	font-size: 0.875rem;
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.sl-markdown-content th {
+	background: var(--sl-color-bg);
+	color: var(--sl-color-gray-1);
+	font-weight: 500;
+	text-align: left;
+	padding: 0.65rem 0.95rem;
+	border-bottom: 1px solid var(--sl-color-hairline);
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.sl-markdown-content td {
+	padding: 0.75rem 0.95rem;
+	border-bottom: 1px solid var(--sl-color-hairline-light);
+	vertical-align: top;
+	color: var(--sl-color-gray-2);
+}
+
+.sl-markdown-content tr:last-child td {
+	border-bottom: none;
+}
+
+.sl-markdown-content tr:hover td {
+	background: var(--sl-color-gray-6);
+}
+
+/* Badges for Parameter Types & Requirements */
+.param-type {
+	display: inline-block;
+	font-family: var(--sl-font-mono);
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: var(--sl-color-gray-1);
+	background: var(--theme-badge-bg);
+	border: 1px solid var(--theme-badge-border);
+	padding: 0.1rem 0.35rem;
+	border-radius: 4px;
+}
+
+.param-required {
+	display: inline-block;
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: #ef4444;
+	background: rgba(239, 68, 68, 0.08);
+	padding: 0.1rem 0.35rem;
+	border-radius: 4px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.param-optional {
+	display: inline-block;
+	font-size: 0.7rem;
+	font-weight: 500;
+	color: var(--sl-color-gray-4);
+	background: var(--theme-badge-bg);
+	padding: 0.1rem 0.35rem;
+	border-radius: 4px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------------------------------
+   Callouts & Asides (Restrained Resend Style)
+   -------------------------------------------------------------------------- */
+.starlight-aside {
+	border-radius: 8px !important;
+	border-width: 1px 1px 1px 2px !important;
+	margin: 1.5rem 0 !important;
+	padding: 0.9rem 1.15rem !important;
+	font-size: 0.92rem !important;
+}
+
+.starlight-aside--note {
+	background: var(--sl-color-gray-6) !important;
+	border-color: var(--sl-color-hairline) !important;
+	border-left-color: var(--sl-color-gray-1) !important;
+}
+
+.starlight-aside--tip {
+	background: rgba(16, 185, 129, 0.04) !important;
+	border-color: rgba(16, 185, 129, 0.18) !important;
+	border-left-color: #10b981 !important;
+}
+
+.starlight-aside--caution,
+.starlight-aside--danger {
+	background: rgba(239, 68, 68, 0.04) !important;
+	border-color: rgba(239, 68, 68, 0.18) !important;
+	border-left-color: #ef4444 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Navigation Cards
+   -------------------------------------------------------------------------- */
+.guide-card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 0.85rem;
+	margin: 1.5rem 0 2rem 0;
+}
+
+.guide-card {
+	display: flex;
+	flex-direction: column;
+	background: var(--theme-surface-card);
+	border: 1px solid var(--theme-surface-card-border);
+	border-radius: 8px;
+	padding: 1.15rem;
+	text-decoration: none !important;
+	color: inherit !important;
+	transition: all 0.15s ease-in-out;
+}
+
+.guide-card:hover {
+	border-color: var(--theme-surface-card-hover);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+	transform: translateY(-1px);
+}
+
+.guide-card-title {
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--sl-color-gray-1);
+	margin-bottom: 0.35rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.guide-card-title span.arrow {
+	font-size: 0.9rem;
+	color: var(--sl-color-gray-4);
+	transition: transform 0.15s, color 0.15s;
+}
+
+.guide-card:hover .guide-card-title span.arrow {
+	color: var(--sl-color-gray-1);
+	transform: translateX(3px);
+}
+
+.guide-card-desc {
+	font-size: 0.85rem;
+	color: var(--sl-color-gray-3);
+	margin: 0;
+	line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   Custom Subtle Scrollbars
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--sl-color-hairline);
+	border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--sl-color-gray-4);
+}
