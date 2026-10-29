@@ -372,6 +372,20 @@ starlight-toc nav ul ul li a {
 	text-decoration-color: var(--sl-color-gray-1);
 }
 
+.sl-markdown-content blockquote {
+	margin: 1.25rem 0 !important;
+	padding: 0.75rem 1.15rem !important;
+	border-left: 2px solid var(--theme-toc-active-line) !important;
+	background: var(--sl-color-gray-6) !important;
+	border-radius: 0 8px 8px 0 !important;
+	color: var(--sl-color-gray-1) !important;
+	font-size: 0.95rem !important;
+}
+
+.sl-markdown-content blockquote p {
+	margin: 0 !important;
+}
+
 /* --------------------------------------------------------------------------
    Inline Code & Expressive Code Blocks
    -------------------------------------------------------------------------- */

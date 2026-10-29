@@ -1,9 +1,9 @@
 ---
 title: Installation & Requirements
-description: How to install and set up unified-nepal-payments in your TypeScript or JavaScript project.
+description: How to install and set up nepay in your TypeScript or JavaScript project.
 ---
 
-`unified-nepal-payments` is published to the npm registry as a zero-dependency (other than Zod) core library targeting Node 18+.
+`nepay` is published to the npm registry as a zero-dependency (other than Zod) core library targeting Node 18+.
 
 ## Installation
 
@@ -11,16 +11,16 @@ Install the package using your favorite package manager:
 
 ```bash
 # npm
-npm install unified-nepal-payments
+npm install nepay
 
 # pnpm
-pnpm add unified-nepal-payments
+pnpm add nepay
 
 # yarn
-yarn add unified-nepal-payments
+yarn add nepay
 
 # bun
-bun add unified-nepal-payments
+bun add nepay
 ```
 
 ## Runtime Requirements

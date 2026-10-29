@@ -1,15 +1,17 @@
 ---
 title: Integer Paisa & Money Math
-description: Why unified-nepal-payments uses integer paisa and how to avoid floating-point errors.
+description: Why nepay uses integer paisa and how to avoid floating-point errors.
 ---
 
 One of the most frequent sources of payment bugs and silent reconciliation failures in fintech applications is **floating-point arithmetic drift** (e.g. `0.1 + 0.2 === 0.30000000000000004`).
 
-To make `unified-nepal-payments` mathematically deterministic and safe across all databases and platforms, **every monetary amount in the public API is an integer paisa**.
+To make `nepay` mathematically deterministic and safe across all databases and platforms, **every monetary amount in the public API is an integer paisa**.
 
 ## The Paisa Rule
 
-$$1 \text{ NPR (Rupee)} = 100 \text{ Paisa}$$
+> **1 NPR (Rupee) = 100 Paisa**
+
+Every amount passed to `initiatePayment()` or returned by `verifyPayment()` is represented in integer paisa. Never pass decimal amounts or floating-point numbers.
 
 | NPR Display | Paisa Value | Note |
 |---|---|---|
@@ -23,7 +25,7 @@ $$1 \text{ NPR (Rupee)} = 100 \text{ Paisa}$$
 The SDK provides three dedicated helpers for converting between rupees and paisa:
 
 ```ts
-import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "unified-nepal-payments";
+import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "nepay";
 ```
 
 ### 1. `nprToPaisa(npr: number): number`
@@ -61,7 +63,7 @@ eSewa requires decimal rupees in form submissions (e.g. `"100"` or `"112.50"`). 
   "total_amount": "1,000.0"
 }
 ```
-If you perform string equality `total_amount === "1000"`, the verification would fail! `unified-nepal-payments` solves this by:
+If you perform string equality `total_amount === "1000"`, the verification would fail! `nepay` solves this by:
 1. Verifying the HMAC-SHA256 signature against the **raw string** as received (`"1,000.0"`).
 2. Stripping commas and parsing the amount to paisa (`100000`) for exact numeric comparison against `expectedAmountPaisa`.
 3. Normalizing to plain decimal `"1000.0"` before invoking eSewa's status query endpoint.

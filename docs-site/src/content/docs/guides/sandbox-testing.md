@@ -82,7 +82,7 @@ KHALTI_ENV="sandbox"
 
 ## 3. Running SDK Automated Tests
 
-`unified-nepal-payments` comes with two test suites:
+`nepay` comes with two test suites:
 
 ### Offline Unit Tests
 Tests schema validation, HMAC signature computation, comma formatting resilience, and error handling without making real network calls.

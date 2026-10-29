@@ -22,7 +22,7 @@ import {
   type EsewaConfig,
   type KhaltiConfig,
   EsewaRetryableError,
-} from "unified-nepal-payments";
+} from "nepay";
 
 const app = express();
 

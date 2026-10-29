@@ -7,11 +7,11 @@ description: Frequently asked questions, debugging tips, and common pitfalls in 
 
 ### Why does eSewa return `PENDING` to my `failureUrl`?
 In eSewa ePay v2, when a transaction is not completed immediately or times out, eSewa redirects to `failureUrl` with `status: "PENDING"` rather than `"FAILED"`.
-`unified-nepal-payments` handles this automatically: calling `verifyPayment()` returns `status: "pending"`. You should keep the order in a pending state and query the status later.
+`nepay` handles this automatically: calling `verifyPayment()` returns `status: "pending"`. You should keep the order in a pending state and query the status later.
 
 ### Why is Khalti rejecting my transaction with "Amount Breakdown mismatch"?
 If you pass `amountBreakdown`, Khalti requires that the sum of each item's `amount` must **strictly equal** the top-level `amountPaisa`.
-`unified-nepal-payments` validates this pre-flight before sending the request to Khalti.
+`nepay` validates this pre-flight before sending the request to Khalti.
 
 ### Why does my browser get a CORS error when initiating a payment?
 Initiating payments requires your merchant secret keys. If you try to call Khalti's `/epayment/initiate/` or build signatures in client-side React code, the gateway blocks the request via CORS. This is intentional: **initiation must happen server-side**.

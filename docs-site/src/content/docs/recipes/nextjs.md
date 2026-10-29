@@ -1,6 +1,6 @@
 ---
 title: Next.js App Router & Server Actions
-description: Using unified-nepal-payments inside Next.js 14+ Server Actions and Route Handlers.
+description: Using nepay inside Next.js 14+ Server Actions and Route Handlers.
 ---
 
 Next.js Server Actions allow you to run backend code directly from your UI components while ensuring secret keys never leave the server.
@@ -15,7 +15,7 @@ import {
   verifyPayment,
   type EsewaConfig,
   type KhaltiConfig,
-} from "unified-nepal-payments";
+} from "nepay";
 
 const esewaConfig: EsewaConfig = {
   productCode: process.env.ESEWA_PRODUCT_CODE!,
@@ -90,7 +90,7 @@ Because eSewa returns via form submission (POST) or query redirect (GET), a Rout
 
 ```ts title="app/checkout/esewa/callback/route.ts"
 import { NextRequest, NextResponse } from "next/server";
-import { verifyPayment, type EsewaConfig } from "unified-nepal-payments";
+import { verifyPayment, type EsewaConfig } from "nepay";
 
 const esewaConfig: EsewaConfig = {
   productCode: process.env.ESEWA_PRODUCT_CODE!,
