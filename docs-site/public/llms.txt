@@ -6,7 +6,7 @@
 - **License**: MIT
 - **Runtime**: Node 18+, Bun, Deno, Next.js Server Actions, Express.js
 - **Full Docs File**: https://unified-nepal-payments.dev/llms-full.txt
-- **GitHub**: https://github.com/bivss/unified-nepal-payments
+- **GitHub**: https://github.com/bivekk51/nepal-payment-sdk
 
 ## Core Rules & Principles
 1. **Integer Paisa Only**: All monetary values are strictly integer paisa (e.g. NPR 100.00 = 10000 paisa). Never pass floating-point numbers.

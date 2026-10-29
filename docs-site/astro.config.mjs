@@ -10,8 +10,11 @@ export default defineConfig({
 			description: 'Unified server-side TypeScript SDK for Nepal payment gateways (eSewa & Khalti).',
 			customCss: ['./src/styles/custom.css'],
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bivss/unified-nepal-payments' }
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bivekk51/nepal-payment-sdk' }
 			],
+			editLink: {
+				baseUrl: 'https://github.com/bivekk51/nepal-payment-sdk/edit/main/docs-site/',
+			},
 			sidebar: [
 				{
 					label: 'Start Here',

@@ -1,6 +1,7 @@
 # unified-nepal-payments
 
 [![npm version](https://img.shields.io/npm/v/unified-nepal-payments.svg)](https://www.npmjs.com/package/unified-nepal-payments)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-nepal--payment--sdk-181717.svg?logo=github)](https://github.com/bivekk51/nepal-payment-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](tsconfig.json)

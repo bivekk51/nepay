@@ -41,4 +41,4 @@ FonePay is scoped for **Phase 2** of `unified-nepal-payments` because FonePay do
 | **Return URL** | Yes (Browser redirect) | Yes (Browser redirect) | None (WebSocket hint + S2S Polling) |
 | **Test Sandbox** | Open public sandbox | Self-serve sandbox | Gated / Bank approval required |
 
-If your organization has an active FonePay merchant agreement with an API certificate and would like early access to the Phase 2 FonePay integration module, please open an issue on [GitHub](https://github.com/bivss/unified-nepal-payments).
+If your organization has an active FonePay merchant agreement with an API certificate and would like early access to the Phase 2 FonePay integration module, please open an issue on [GitHub](https://github.com/bivekk51/nepal-payment-sdk).

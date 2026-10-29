@@ -5,7 +5,7 @@
 Package: `unified-nepal-payments`
 Version: `0.1.0`
 License: MIT
-Repository: https://github.com/bivss/unified-nepal-payments
+Repository: https://github.com/bivekk51/nepal-payment-sdk
 
 ---
 
