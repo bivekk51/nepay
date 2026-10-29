@@ -5,7 +5,7 @@
 - **Package**: `nepay`
 - **License**: MIT
 - **Runtime**: Node 18+, Bun, Deno, Next.js Server Actions, Express.js
-- **Full Docs File**: https://nepay.dev/llms-full.txt
+- **Full Docs File**: https://nepay.nepalbivek.com.np/llms-full.txt
 - **GitHub**: https://github.com/bivekk51/nepay
 
 ## Core Rules & Principles

@@ -16,7 +16,7 @@ Unified server-side TypeScript SDK for Nepal payment gateways: **eSewa (ePay v2)
 
 All monetary amounts are strictly **integer paisa** (`1 NPR = 100 paisa`) to eliminate floating-point rounding bugs.
 
-📖 **[Full Documentation & Guides](https://nepay.dev)** (or run `npm run docs:dev` locally)
+📖 **[Full Documentation & Guides](https://nepay.nepalbivek.com.np/)** (or run `npm run docs:dev` locally)
 
 ---
 
