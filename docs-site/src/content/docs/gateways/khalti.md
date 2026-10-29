@@ -1,6 +1,6 @@
 ---
-title: Khalti (ePayment v2) Integration
-description: Comprehensive guide to integrating Khalti ePayment v2 (KPG-2) using nepay.
+title: Khalti Payment Gateway v2 Integration
+description: Integrate Khalti ePayment v2 (KPG-2) in Node.js and TypeScript. Complete guide covering initiate, hosted payment checkout, and pidx lookup verification.
 ---
 
 Khalti provides a modern, RESTful checkout experience known as **Khalti Payment Gateway v2 (KPG-2)**. Unlike form-based redirects, Khalti relies on server-to-server JSON API requests, returning a hosted payment page URL (`payment_url`) and a unique payment session identifier (`pidx`).
@@ -40,7 +40,7 @@ To obtain your sandbox keys:
 3. Copy your test **Secret Key** (`live_secret_key` or `test_secret_key`).
 
 ```ts title="src/lib/khalti.ts"
-import type { KhaltiConfig } from "nepay";
+import type { KhaltiConfig } from "@bivekkk/nepay";
 
 export const khaltiConfig: KhaltiConfig = {
   secretKey: process.env.KHALTI_SECRET_KEY!,
@@ -69,7 +69,7 @@ export const khaltiConfig: KhaltiConfig = {
 Call `initiatePayment()` or the standalone function `initiateKhalti()`:
 
 ```ts title="src/routes/checkout.ts"
-import { initiatePayment } from "nepay";
+import { initiatePayment } from "@bivekkk/nepay";
 import { khaltiConfig } from "../lib/khalti.js";
 
 const result = await initiatePayment({
@@ -151,7 +151,7 @@ You **must** execute an independent server-to-server lookup using `verifyPayment
 :::
 
 ```ts title="src/routes/callback.ts"
-import { verifyPayment } from "nepay";
+import { verifyPayment } from "@bivekkk/nepay";
 import { khaltiConfig } from "../lib/khalti.js";
 
 export async function handleKhaltiReturn(req, res) {

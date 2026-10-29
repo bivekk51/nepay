@@ -1,6 +1,6 @@
 ---
-title: Express.js Integration Recipe
-description: Complete production-ready Express.js server example for accepting eSewa and Khalti payments.
+title: Express.js eSewa & Khalti Integration
+description: Production-ready Express.js server example for eSewa ePay v2 and Khalti ePayment v2 with webhook and callback verification.
 ---
 
 This recipe demonstrates a complete, production-ready Express.js application implementing:
@@ -22,7 +22,7 @@ import {
   type EsewaConfig,
   type KhaltiConfig,
   EsewaRetryableError,
-} from "nepay";
+} from "@bivekkk/nepay";
 
 const app = express();
 

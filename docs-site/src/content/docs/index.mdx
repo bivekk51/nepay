@@ -1,7 +1,29 @@
 ---
-title: "Nepay"
-description: "Developer-first, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2)."
+title: "Nepal Payment Gateway SDK (eSewa & Khalti)"
+description: "Developer-first, typesafe TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks and integer paisa math."
 editUrl: false
+head:
+  - tag: script
+    attrs:
+      type: application/ld+json
+    content: |
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Nepay",
+        "headline": "Unified Nepal Payment Gateway SDK",
+        "description": "Developer-first, typesafe TypeScript SDK for Nepal digital payment gateways: eSewa ePay v2 and Khalti ePayment v2.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Node.js, Bun, Deno",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "NPR"
+        },
+        "url": "https://nepay.nepalbivek.com.np/",
+        "softwareVersion": "0.1.1",
+        "license": "https://opensource.org/licenses/MIT"
+      }
 ---
 
 import HeroDiagram from '../../components/HeroDiagram.astro';

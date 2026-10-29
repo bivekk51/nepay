@@ -203,4 +203,13 @@ KHALTI_ENV="sandbox"
   npm run docs:build  # Build production static documentation
   ```
 
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines, branch etiquette, and pull request procedures.
+
+## License
+
+MIT © [Bivek](https://nepalbivek.com.np/)
+
+
 

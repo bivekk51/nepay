@@ -1,6 +1,6 @@
 ---
 title: eSewa (ePay v2) Integration
-description: Comprehensive guide to integrating eSewa ePay v2 using nepay.
+description: Integrate eSewa ePay v2 in Node.js and TypeScript. Complete guide covering HMAC-SHA256 signatures, sandbox testing, and S2S verification.
 ---
 
 eSewa is the most widely adopted digital payment wallet in Nepal. `nepay` supports the modern **ePay v2** protocol, featuring cryptographic HMAC-SHA256 signatures, base64 callback payloads, and server-to-server status verification.
@@ -36,7 +36,7 @@ eSewa is the most widely adopted digital payment wallet in Nepal. `nepay` suppor
 Store your credentials in server-only environment variables:
 
 ```ts title="src/lib/esewa.ts"
-import type { EsewaConfig } from "nepay";
+import type { EsewaConfig } from "@bivekkk/nepay";
 
 export const esewaConfig: EsewaConfig = {
   productCode: process.env.ESEWA_PRODUCT_CODE ?? "EPAYTEST",
@@ -64,7 +64,7 @@ export const esewaConfig: EsewaConfig = {
 eSewa requires an HTML Form POST containing signed hidden inputs. Call `initiatePayment()`:
 
 ```ts title="src/routes/checkout.ts"
-import { initiatePayment } from "nepay";
+import { initiatePayment } from "@bivekkk/nepay";
 import { esewaConfig } from "../lib/esewa.js";
 
 const result = await initiatePayment({
@@ -163,7 +163,7 @@ When decoded from Base64, the `data` parameter contains a JSON object:
 3. Queries eSewa's S2S Status Endpoint (`/api/epay/transaction/status/`) to confirm that eSewa's records show `status: "COMPLETE"` and match the order ID and amount.
 
 ```ts title="src/routes/callback.ts"
-import { verifyPayment, EsewaRetryableError } from "nepay";
+import { verifyPayment, EsewaRetryableError } from "@bivekkk/nepay";
 import { esewaConfig } from "../lib/esewa.js";
 
 export async function handleEsewaCallback(req, res) {

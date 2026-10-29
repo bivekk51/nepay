@@ -1,6 +1,6 @@
 ---
-title: Quick Start
-description: Start accepting eSewa and Khalti payments in under 5 minutes with nepay.
+title: Quick Start — eSewa & Khalti in 5 Minutes
+description: Step-by-step quickstart to integrate eSewa ePay v2 and Khalti ePayment v2 in Node.js and TypeScript using @bivekkk/nepay.
 ---
 
 Accepting online payments across Nepal requires handling two fundamentally different gateway architectures:
@@ -30,7 +30,7 @@ KHALTI_ENV="sandbox"
 Initialize provider configurations in a server module:
 
 ```ts title="src/lib/payment.ts"
-import type { EsewaConfig, KhaltiConfig } from "nepay";
+import type { EsewaConfig, KhaltiConfig } from "@bivekkk/nepay";
 
 export const esewaConfig: EsewaConfig = {
   productCode: process.env.ESEWA_PRODUCT_CODE ?? "EPAYTEST",
@@ -71,7 +71,7 @@ Call `initiatePayment()` with `method: "esewa"` or `method: "khalti"`. TypeScrip
 ### Example: eSewa Initiation
 
 ```ts title="src/routes/checkout.ts"
-import { initiatePayment } from "nepay";
+import { initiatePayment } from "@bivekkk/nepay";
 import { esewaConfig } from "../lib/payment.js";
 
 const checkout = await initiatePayment({
@@ -111,7 +111,7 @@ const checkout = await initiatePayment({
 ### Example: Khalti Initiation
 
 ```ts title="src/routes/checkout.ts"
-import { initiatePayment } from "nepay";
+import { initiatePayment } from "@bivekkk/nepay";
 import { khaltiConfig } from "../lib/payment.js";
 
 const checkout = await initiatePayment({
@@ -160,7 +160,7 @@ When the customer completes the transaction, they are redirected back to your ca
 When eSewa redirects back, it attaches a base64-encoded `data` parameter in the query or body:
 
 ```ts title="src/routes/callback.ts"
-import { verifyPayment } from "nepay";
+import { verifyPayment } from "@bivekkk/nepay";
 import { esewaConfig } from "../lib/payment.js";
 
 export async function handleEsewaCallback(req, res) {
@@ -197,7 +197,7 @@ export async function handleEsewaCallback(req, res) {
 When Khalti redirects back to your `returnUrl`, it appends `?pidx=...&status=...`:
 
 ```ts title="src/routes/callback.ts"
-import { verifyPayment } from "nepay";
+import { verifyPayment } from "@bivekkk/nepay";
 import { khaltiConfig } from "../lib/payment.js";
 
 export async function handleKhaltiCallback(req, res) {

@@ -25,7 +25,7 @@ Every amount passed to `initiatePayment()` or returned by `verifyPayment()` is r
 The SDK provides three dedicated helpers for converting between rupees and paisa:
 
 ```ts
-import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "nepay";
+import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "@bivekkk/nepay";
 ```
 
 ### 1. `nprToPaisa(npr: number): number`

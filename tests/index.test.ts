@@ -47,6 +47,22 @@ describe("unified", () => {
       },
     });
     expect(khaltiRes).toMatchObject({ pidx: "pidx-123", payment_url: expect.any(String) });
+
+    const khaltiWithOrderIdRes = await initiatePayment({
+      method: "khalti",
+      config: {
+        secretKey: "test-secret-key",
+        websiteUrl: "https://example.com",
+        returnUrl: "https://example.com/return",
+        env: "sandbox",
+      },
+      order: {
+        orderId: "ORDER-ALIAS-1",
+        purchaseOrderName: "Test order alias",
+        amountPaisa: 10000,
+      },
+    });
+    expect(khaltiWithOrderIdRes).toMatchObject({ pidx: "pidx-123", payment_url: expect.any(String) });
   });
 
   it("routes verifyPayment to esewa/khalti verifiers (mocked)", async () => {

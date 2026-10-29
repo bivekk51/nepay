@@ -18,7 +18,7 @@ function initiatePayment(
 #### Parameters:
 - `input`: A discriminated union on `method`:
   - `method: 'esewa'`: Requires `config: EsewaConfig` and `order: { orderId, amountPaisa, taxPaisa?, servicePaisa?, deliveryPaisa? }`.
-  - `method: 'khalti'`: Requires `config: KhaltiConfig` and `order: { purchaseOrderId, purchaseOrderName, amountPaisa, customerInfo?, amountBreakdown?, extra? }`.
+  - `method: 'khalti'`: Requires `config: KhaltiConfig` and `order: { purchaseOrderId (or orderId), purchaseOrderName, amountPaisa, customerInfo?, amountBreakdown?, extra? }`.
 
 #### Returns:
 - For eSewa: `{ url: string, fields: Record<string, string> }` (target form URL and hidden input dictionary).

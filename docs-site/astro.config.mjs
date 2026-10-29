@@ -19,6 +19,10 @@ export default defineConfig({
 				{ tag: 'link', attrs: { rel: 'alternate icon', type: 'image/png', href: '/favicon-32x32.png' } },
 				{ tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico' } },
 				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
+				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://nepay.nepalbivek.com.np/nepay-banner.svg' } },
+				{ tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
+				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://nepay.nepalbivek.com.np/nepay-banner.svg' } },
+				{ tag: 'meta', attrs: { name: 'keywords', content: 'esewa integration nodejs, khalti integration nodejs, nepal payment gateway, esewa epay v2 typescript, khalti epayment v2, esewa sandbox credentials, nextjs payment nepal, nepay' } },
 			],
 			customCss: ['./src/styles/custom.css'],
 			components: {

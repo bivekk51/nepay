@@ -1,6 +1,6 @@
 ---
-title: Testing & Sandbox Credentials
-description: Step-by-step instructions for testing eSewa and Khalti integrations with official sandbox credentials.
+title: eSewa & Khalti Sandbox Test Credentials
+description: Official test credentials, customer test wallets, MPINs, and OTPs for testing eSewa UAT and Khalti sandbox payment flows.
 ---
 
 Testing digital payment gateways in Nepal requires testing against official staging and sandbox environments before applying for production merchant credentials.

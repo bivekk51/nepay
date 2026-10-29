@@ -63,20 +63,25 @@ export const EsewaInitiateSchema = z.object({
 export const KhaltiInitiateSchema = z.object({
   method: z.literal("khalti"),
   config: KhaltiConfigSchema,
-  order: z.object({
-    purchaseOrderId: z.string(),
-    purchaseOrderName: z.string(),
-    amountPaisa: z.number().int(),
-    customerInfo: z
-      .object({
-        name: z.string().optional(),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-      })
-      .optional(),
-    amountBreakdown: z.array(z.object({ label: z.string(), amount: z.number().int() })).optional(),
-    extra: z.record(z.string()).optional(),
-  }),
+  order: z
+    .object({
+      orderId: z.string().optional(),
+      purchaseOrderId: z.string().optional(),
+      purchaseOrderName: z.string(),
+      amountPaisa: z.number().int(),
+      customerInfo: z
+        .object({
+          name: z.string().optional(),
+          email: z.string().optional(),
+          phone: z.string().optional(),
+        })
+        .optional(),
+      amountBreakdown: z.array(z.object({ label: z.string(), amount: z.number().int() })).optional(),
+      extra: z.record(z.string()).optional(),
+    })
+    .refine((data) => Boolean(data.orderId || data.purchaseOrderId), {
+      message: "Either orderId or purchaseOrderId must be provided",
+    }),
 });
 
 export const UnifiedInitiateInput = z.discriminatedUnion("method", [
@@ -124,16 +129,18 @@ export async function initiatePayment(input: UnifiedInitiateInput): Promise<
         servicePaisa: parsed.order.servicePaisa,
         deliveryPaisa: parsed.order.deliveryPaisa,
       });
-    case "khalti":
+    case "khalti": {
+      const orderId = (parsed.order.purchaseOrderId || parsed.order.orderId)!;
       return initiateKhalti({
         config: parsed.config,
-        purchaseOrderId: parsed.order.purchaseOrderId,
+        purchaseOrderId: orderId,
         purchaseOrderName: parsed.order.purchaseOrderName,
         amountPaisa: parsed.order.amountPaisa,
         customerInfo: parsed.order.customerInfo,
         amountBreakdown: parsed.order.amountBreakdown,
         extra: parsed.order.extra as Record<`merchant_${string}`, string> | undefined,
       });
+    }
   }
 }
 
