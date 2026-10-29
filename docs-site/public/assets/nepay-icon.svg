@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="nepay-emerald" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+    <linearGradient id="nepay-indigo" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+    <linearGradient id="nepay-dark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E4E4E7" />
+    </linearGradient>
+    <linearGradient id="nepay-dark-accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#A1A1AA" />
+      <stop offset="100%" stop-color="#71717A" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Gateway Pillar & Mountain Ridge Peak (Stroke A) -->
+  <path d="M 15 52 
+           L 15 20 
+           C 15 15.5 18 12 22.5 12 
+           C 25.5 12 28.5 13.8 30.5 16.5 
+           L 47 40"
+        stroke="#FFFFFF" 
+        stroke-width="8" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Negative Space Knockout Mask for Interlocking Bridge -->
+  <path d="M 17 24 
+           L 33.5 47.5 
+           C 35.5 50.2 38.5 52 41.5 52 
+           C 46 52 49 48.5 49 44 
+           L 49 12"
+        stroke="#0a0a0c" 
+        stroke-width="13" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Right Gateway Pillar & Unified Bridge (Stroke B) -->
+  <path d="M 17 24 
+           L 33.5 47.5 
+           C 35.5 50.2 38.5 52 41.5 52 
+           C 46 52 49 48.5 49 44 
+           L 49 12"
+        stroke="#A1A1AA" 
+        stroke-width="8" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+</svg>

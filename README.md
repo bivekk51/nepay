@@ -1,16 +1,22 @@
-# unified-nepal-payments
+<p align="center">
+  <img src="assets/nepay-banner.svg" alt="nepay - unified Nepal payment SDK" width="100%">
+</p>
 
-[![npm version](https://img.shields.io/npm/v/unified-nepal-payments.svg)](https://www.npmjs.com/package/unified-nepal-payments)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-nepal--payment--sdk-181717.svg?logo=github)](https://github.com/bivekk51/nepal-payment-sdk)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](tsconfig.json)
+<p align="center">
+  <a href="https://www.npmjs.com/package/nepay"><img src="https://img.shields.io/npm/v/nepay.svg" alt="npm version"></a>
+  <a href="https://github.com/bivekk51/nepay"><img src="https://img.shields.io/badge/GitHub-nepay-181717.svg?logo=github" alt="GitHub Repository"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg" alt="Node.js Version"></a>
+  <a href="tsconfig.json"><img src="https://img.shields.io/badge/TypeScript-5.x-blue.svg" alt="TypeScript"></a>
+</p>
+
+# nepay
 
 Unified server-side TypeScript SDK for Nepal payment gateways: **eSewa (ePay v2)** + **Khalti (ePayment v2)** behind a single, typesafe, zod-discriminated `initiatePayment` / `verifyPayment` surface.
 
-All monetary amounts are strictly **integer paisa** ($1\text{ NPR} = 100\text{ paisa}$) to eliminate floating-point rounding bugs.
+All monetary amounts are strictly **integer paisa** (`1 NPR = 100 paisa`) to eliminate floating-point rounding bugs.
 
-📖 **[Full Documentation & Guides](https://unified-nepal-payments.dev)** (or run `npm run docs:dev` locally)
+📖 **[Full Documentation & Guides](https://nepay.dev)** (or run `npm run docs:dev` locally)
 
 ---
 
@@ -28,7 +34,7 @@ All monetary amounts are strictly **integer paisa** ($1\text{ NPR} = 100\text{ p
 ## Install
 
 ```bash
-npm install unified-nepal-payments
+npm install nepay
 ```
 
 Requires Node >= 18 (global `fetch` and `node:crypto`).
@@ -92,7 +98,7 @@ Only fulfil a Khalti order when `verifyPayment` returns `status: "completed"` �
 ## Unified usage
 
 ```ts
-import { initiatePayment, verifyPayment } from "unified-nepal-payments";
+import { initiatePayment, verifyPayment } from "nepay";
 
 // eSewa form fields — initiatePayment returns a union, so narrow it:
 const esewa = await initiatePayment({ method: "esewa", config: esewaConfig, order: { orderId, amountPaisa } });

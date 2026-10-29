@@ -1,24 +1,37 @@
 ---
-title: "Unified Nepal Payments"
-description: "Unified, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2)."
+title: "Nepay"
+description: "Developer-first, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2)."
 editUrl: false
 ---
 
-A unified, typesafe, server-side TypeScript SDK for integrating Nepal's leading digital payment gateways: **eSewa (ePay v2)** and **Khalti (ePayment v2)**. Built for modern backend runtimes with strict integer paisa arithmetic, mandatory server-to-server (S2S) verification, and zero client-side credential leaks.
+import { Image } from 'astro:assets';
+import heroImage from '../../assets/hero.svg';
+
+<div style="margin: 1.5rem 0 2rem 0; width: 100%;">
+  <Image 
+    src={heroImage} 
+    alt="Nepay payment gateway architecture and verification flow" 
+    width={540} 
+    height={380} 
+    style="width: 100%; height: auto; border-radius: 12px; display: block;" 
+  />
+</div>
+
+A developer-first, typesafe, server-side TypeScript SDK for integrating Nepal's leading digital payment gateways: **eSewa (ePay v2)** and **Khalti (ePayment v2)**. Built for modern backend runtimes with strict integer paisa arithmetic, mandatory server-to-server (S2S) verification, and zero client-side credential leaks.
 
 ## Quick Installation
 
 Install via your preferred package manager (Node 18+ required):
 
 ```bash
-npm install unified-nepal-payments
+npm install nepay
 ```
 
 ```bash
 # Alternative package managers
-pnpm add unified-nepal-payments
-yarn add unified-nepal-payments
-bun add unified-nepal-payments
+pnpm add nepay
+yarn add nepay
+bun add nepay
 ```
 
 ## First Payment in 60 Seconds
@@ -28,7 +41,7 @@ The SDK provides two core functions: `initiatePayment()` and `verifyPayment()`. 
 ### Step 1: Initiate Payment
 
 ```ts
-import { initiatePayment } from "unified-nepal-payments";
+import { initiatePayment } from "nepay";
 
 // 1. Initiate eSewa payment
 const checkout = await initiatePayment({
@@ -64,7 +77,7 @@ const checkout = await initiatePayment({
 When the customer finishes payment, eSewa redirects back to your `successUrl` with a base64 encoded payload. `verifyPayment()` validates the signature and queries eSewa's status endpoint to confirm receipt before marking the order complete.
 
 ```ts
-import { verifyPayment } from "unified-nepal-payments";
+import { verifyPayment } from "nepay";
 
 // 2. Verify eSewa callback on your server
 const result = await verifyPayment({

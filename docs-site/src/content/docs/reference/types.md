@@ -1,6 +1,6 @@
 ---
 title: "API Reference: Types & Schemas"
-description: TypeScript interfaces, types, and Zod schemas exported by unified-nepal-payments.
+description: TypeScript interfaces, types, and Zod schemas exported by nepay.
 ---
 
 ## Types

@@ -1,12 +1,12 @@
-# Unified Nepal Payments
+# nepay
 
-> Unified, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
+> Developer-first, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
 
-- **Package**: `unified-nepal-payments`
+- **Package**: `nepay`
 - **License**: MIT
 - **Runtime**: Node 18+, Bun, Deno, Next.js Server Actions, Express.js
-- **Full Docs File**: https://unified-nepal-payments.dev/llms-full.txt
-- **GitHub**: https://github.com/bivekk51/nepal-payment-sdk
+- **Full Docs File**: https://nepay.dev/llms-full.txt
+- **GitHub**: https://github.com/bivekk51/nepay
 
 ## Core Rules & Principles
 1. **Integer Paisa Only**: All monetary values are strictly integer paisa (e.g. NPR 100.00 = 10000 paisa). Never pass floating-point numbers.
@@ -16,16 +16,16 @@
 
 ## Installation
 ```bash
-npm install unified-nepal-payments
+npm install nepay
 # or
-pnpm add unified-nepal-payments
+pnpm add nepay
 # or
-bun add unified-nepal-payments
+bun add nepay
 ```
 
 ## Quick Example
 ```ts
-import { initiatePayment, verifyPayment, type EsewaConfig, type KhaltiConfig } from "unified-nepal-payments";
+import { initiatePayment, verifyPayment, type EsewaConfig, type KhaltiConfig } from "nepay";
 
 // 1. Initiate eSewa checkout (returns form URL & signed fields)
 const esewa = await initiatePayment({

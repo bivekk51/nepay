@@ -1,13 +1,13 @@
 ---
 title: Quick Start
-description: Start accepting eSewa and Khalti payments in under 5 minutes with unified-nepal-payments.
+description: Start accepting eSewa and Khalti payments in under 5 minutes with nepay.
 ---
 
 Accepting online payments across Nepal requires handling two fundamentally different gateway architectures:
 - **eSewa (ePay v2)**: Requires an HTML Form POST containing an HMAC-SHA256 digital signature, redirecting the customer's browser, and resolving a base64-encoded callback.
 - **Khalti (ePayment v2 / KPG-2)**: Requires a server-side JSON REST request to `/epayment/initiate/`, redirecting the customer to a hosted `payment_url`, and querying `/epayment/lookup/` with a payment index (`pidx`).
 
-`unified-nepal-payments` unifies both behind a single, typesafe, server-side interface while enforcing strict integer paisa math and mandatory server-to-server verification.
+`nepay` unifies both behind a single, typesafe, server-side interface while enforcing strict integer paisa math and mandatory server-to-server verification.
 
 ---
 
@@ -30,7 +30,7 @@ KHALTI_ENV="sandbox"
 Initialize provider configurations in a server module:
 
 ```ts title="src/lib/payment.ts"
-import type { EsewaConfig, KhaltiConfig } from "unified-nepal-payments";
+import type { EsewaConfig, KhaltiConfig } from "nepay";
 
 export const esewaConfig: EsewaConfig = {
   productCode: process.env.ESEWA_PRODUCT_CODE ?? "EPAYTEST",
@@ -71,7 +71,7 @@ Call `initiatePayment()` with `method: "esewa"` or `method: "khalti"`. TypeScrip
 ### Example: eSewa Initiation
 
 ```ts title="src/routes/checkout.ts"
-import { initiatePayment } from "unified-nepal-payments";
+import { initiatePayment } from "nepay";
 import { esewaConfig } from "../lib/payment.js";
 
 const checkout = await initiatePayment({
@@ -111,7 +111,7 @@ const checkout = await initiatePayment({
 ### Example: Khalti Initiation
 
 ```ts title="src/routes/checkout.ts"
-import { initiatePayment } from "unified-nepal-payments";
+import { initiatePayment } from "nepay";
 import { khaltiConfig } from "../lib/payment.js";
 
 const checkout = await initiatePayment({
@@ -160,7 +160,7 @@ When the customer completes the transaction, they are redirected back to your ca
 When eSewa redirects back, it attaches a base64-encoded `data` parameter in the query or body:
 
 ```ts title="src/routes/callback.ts"
-import { verifyPayment } from "unified-nepal-payments";
+import { verifyPayment } from "nepay";
 import { esewaConfig } from "../lib/payment.js";
 
 export async function handleEsewaCallback(req, res) {
@@ -197,7 +197,7 @@ export async function handleEsewaCallback(req, res) {
 When Khalti redirects back to your `returnUrl`, it appends `?pidx=...&status=...`:
 
 ```ts title="src/routes/callback.ts"
-import { verifyPayment } from "unified-nepal-payments";
+import { verifyPayment } from "nepay";
 import { khaltiConfig } from "../lib/payment.js";
 
 export async function handleKhaltiCallback(req, res) {

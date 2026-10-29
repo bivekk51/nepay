@@ -3,17 +3,29 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-	site: 'https://unified-nepal-payments.dev',
+	site: 'https://nepay.dev',
 	integrations: [
 		starlight({
-			title: 'Unified Nepal Payments',
-			description: 'Unified server-side TypeScript SDK for Nepal payment gateways (eSewa & Khalti).',
+			title: 'Nepay',
+			description: 'Developer-first unified Nepal payments SDK (eSewa + Khalti).',
+			logo: {
+				dark: './src/assets/nepay-logo.svg',
+				light: './src/assets/nepay-logo-light.svg',
+				replacesTitle: true,
+			},
+			favicon: '/favicon.svg',
+			head: [
+				{ tag: 'link', attrs: { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' } },
+				{ tag: 'link', attrs: { rel: 'alternate icon', type: 'image/png', href: '/favicon-32x32.png' } },
+				{ tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico' } },
+				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
+			],
 			customCss: ['./src/styles/custom.css'],
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bivekk51/nepal-payment-sdk' }
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bivekk51/nepay' }
 			],
 			editLink: {
-				baseUrl: 'https://github.com/bivekk51/nepal-payment-sdk/edit/main/docs-site/',
+				baseUrl: 'https://github.com/bivekk51/nepay/edit/main/docs-site/',
 			},
 			sidebar: [
 				{
@@ -22,6 +34,7 @@ export default defineConfig({
 						{ label: 'Overview', slug: 'index' },
 						{ label: 'Installation', slug: 'getting-started/installation' },
 						{ label: 'Quick Start', slug: 'getting-started/quickstart' },
+						{ label: 'Brand & Logo Identity', slug: 'brand' },
 					],
 				},
 				{

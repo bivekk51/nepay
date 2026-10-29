@@ -7,7 +7,7 @@ FonePay is Nepal's dominant interoperable retail payment network operated by F1S
 
 ## Current Status: Phase 2 Roadmap
 
-FonePay is scoped for **Phase 2** of `unified-nepal-payments` because FonePay does not offer an open, self-serve public developer sandbox:
+FonePay is scoped for **Phase 2** of `nepay` because FonePay does not offer an open, self-serve public developer sandbox:
 - Test merchant credentials (`merchantCode`, `secretKey`, `username`, `password`) are bank-gated.
 - FonePay Dynamic QR flow uses a WebSocket notification hint + polling model without standard browser return redirects.
 
@@ -41,4 +41,4 @@ FonePay is scoped for **Phase 2** of `unified-nepal-payments` because FonePay do
 | **Return URL** | Yes (Browser redirect) | Yes (Browser redirect) | None (WebSocket hint + S2S Polling) |
 | **Test Sandbox** | Open public sandbox | Self-serve sandbox | Gated / Bank approval required |
 
-If your organization has an active FonePay merchant agreement with an API certificate and would like early access to the Phase 2 FonePay integration module, please open an issue on [GitHub](https://github.com/bivekk51/nepal-payment-sdk).
+If your organization has an active FonePay merchant agreement with an API certificate and would like early access to the Phase 2 FonePay integration module, please open an issue on [GitHub](https://github.com/bivekk51/nepay).

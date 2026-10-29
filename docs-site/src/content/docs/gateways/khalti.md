@@ -1,6 +1,6 @@
 ---
 title: Khalti (ePayment v2) Integration
-description: Comprehensive guide to integrating Khalti ePayment v2 (KPG-2) using unified-nepal-payments.
+description: Comprehensive guide to integrating Khalti ePayment v2 (KPG-2) using nepay.
 ---
 
 Khalti provides a modern, RESTful checkout experience known as **Khalti Payment Gateway v2 (KPG-2)**. Unlike form-based redirects, Khalti relies on server-to-server JSON API requests, returning a hosted payment page URL (`payment_url`) and a unique payment session identifier (`pidx`).
@@ -40,7 +40,7 @@ To obtain your sandbox keys:
 3. Copy your test **Secret Key** (`live_secret_key` or `test_secret_key`).
 
 ```ts title="src/lib/khalti.ts"
-import type { KhaltiConfig } from "unified-nepal-payments";
+import type { KhaltiConfig } from "nepay";
 
 export const khaltiConfig: KhaltiConfig = {
   secretKey: process.env.KHALTI_SECRET_KEY!,
@@ -69,7 +69,7 @@ export const khaltiConfig: KhaltiConfig = {
 Call `initiatePayment()` or the standalone function `initiateKhalti()`:
 
 ```ts title="src/routes/checkout.ts"
-import { initiatePayment } from "unified-nepal-payments";
+import { initiatePayment } from "nepay";
 import { khaltiConfig } from "../lib/khalti.js";
 
 const result = await initiatePayment({
@@ -151,7 +151,7 @@ You **must** execute an independent server-to-server lookup using `verifyPayment
 :::
 
 ```ts title="src/routes/callback.ts"
-import { verifyPayment } from "unified-nepal-payments";
+import { verifyPayment } from "nepay";
 import { khaltiConfig } from "../lib/khalti.js";
 
 export async function handleKhaltiReturn(req, res) {
@@ -209,7 +209,7 @@ When a payment session is abandoned or expires, Khalti returns an **HTTP 400 Bad
 ```
 
 Many standard HTTP client libraries crash by throwing unhandled network exceptions on HTTP 400 responses.
-`unified-nepal-payments` intercepts 400 responses, safely decodes the JSON body, and maps it directly to:
+`nepay` intercepts 400 responses, safely decodes the JSON body, and maps it directly to:
 
 ```ts
 {

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nepay &bull; Logo Concept & Visual Identity Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0c;
+      --card-bg: #0e0f14;
+      --card-border: #1c1d22;
+      --card-hover: #262832;
+      --hairline: #1c1d22;
+      --text: #ebecee;
+      --text-muted: #71717a;
+      --text-dim: #a1a1aa;
+      --accent: #ffffff;
+      --green: #10b981;
+      --indigo: #6366f1;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 48px 24px 80px 24px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 48px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #14151b;
+      border: 1px solid #22242b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin: 0 0 12px 0;
+      color: #FFFFFF;
+    }
+    p.lead {
+      font-size: 17px;
+      color: var(--text-dim);
+      margin: 0 0 20px 0;
+      max-width: 760px;
+    }
+
+    /* Section Styles */
+    .section {
+      margin-bottom: 56px;
+    }
+    .section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--hairline);
+    }
+
+    /* Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .card-label {
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* Logo Display Boxes */
+    .display-dark {
+      background: #0a0a0c;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .display-light {
+      background: #FFFFFF;
+      border: 1px solid #E4E4E7;
+      border-radius: 10px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle grid background */
+    .grid-pattern {
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* App Icon Squircle */
+    .squircle {
+      width: 108px;
+      height: 108px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, #16171d, #0d0e12);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Explanation Cards */
+    .meaning-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .meaning-card h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin: 0 0 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .meaning-card p {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    /* Code Terminal Demo */
+    .terminal {
+      background: #08080a;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+    .terminal-header {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .t-dot { width: 8px; height: 8px; border-radius: 50%; background: #22232a; }
+
+    /* Size Scales */
+    .size-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 16px 0;
+    }
+    .size-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .size-label {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>nepay &bull; brand identity system</span>
+      </div>
+      <h1>Logo Concept Board</h1>
+      <p class="lead">
+        A developer-first payment SDK identity unifying Nepal's digital payment gateways (eSewa + Khalti) behind one consistent, typesafe TypeScript surface.
+      </p>
+    </header>
+
+    <!-- 1. The Core Meaning: Nepal + Pay -->
+    <div class="section">
+      <div class="section-title">01 &bull; Name & Concept Anatomy</div>
+      <div class="grid-2">
+        <div class="meaning-card">
+          <h4>
+            <span style="color: var(--green);">nepay</span>
+            <span style="color: var(--text-muted); font-weight: 400;">= Nepal + Pay</span>
+          </h4>
+          <p>
+            <strong>Nepal:</strong> The market the SDK is purpose-built for, respecting localized gateway quirks, currency formats, and regulatory requirements.<br>
+            <strong>Pay:</strong> Digital transactions, integer paisa arithmetic, and mission-critical server-to-server payment infrastructure.
+          </p>
+        </div>
+        <div class="meaning-card">
+          <h4>
+            <span style="color: var(--indigo);">&bull;</span>
+            <span>Multiple Gateways, One Interface</span>
+          </h4>
+          <p>
+            The letter <strong>N</strong> is formed by two independent geometric strokes (representing eSewa and Khalti) connecting through a central negative-space diagonal bridge.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Primary Logo: Dark & Light -->
+    <div class="section">
+      <div class="section-title">02 &bull; Primary Horizontal Logo</div>
+      <div class="grid-2">
+        
+        <!-- Dark Variation -->
+        <div class="card">
+          <div class="card-label">DARK THEME (DEFAULT / DOCS SITE)</div>
+          <div class="display-dark grid-pattern">
+            <svg viewBox="0 0 160 40" width="160" height="40" fill="none">
+              <!-- N Mark -->
+              <g transform="translate(0, 4)">
+                <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+                  <path d="M 15 52 L 15 20 C 15 15.5 18 12 22.5 12 C 25.5 12 28.5 13.8 30.5 16.5 L 47 40"
+                        stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#0a0a0c" stroke-width="14" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#A1A1AA" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+              </g>
+              <!-- Wordmark -->
+              <text x="42" y="27" font-family="Inter, sans-serif" font-size="24" font-weight="650" letter-spacing="-0.035em" fill="#FFFFFF">Nepay</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Light Variation -->
+        <div class="card">
+          <div class="card-label">LIGHT THEME (CLEAN MONOCHROME)</div>
+          <div class="display-light">
+            <svg viewBox="0 0 160 40" width="160" height="40" fill="none">
+              <!-- N Mark -->
+              <g transform="translate(0, 4)">
+                <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+                  <path d="M 15 52 L 15 20 C 15 15.5 18 12 22.5 12 C 25.5 12 28.5 13.8 30.5 16.5 L 47 40"
+                        stroke="#111216" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#71717A" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+              </g>
+              <!-- Wordmark -->
+              <text x="42" y="27" font-family="Inter, sans-serif" font-size="24" font-weight="650" letter-spacing="-0.035em" fill="#111216">Nepay</text>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. Standalone N Icon & App Icon -->
+    <div class="section">
+      <div class="section-title">03 &bull; Standalone Icon & App Icon</div>
+      <div class="grid-2">
+        
+        <!-- Standalone Icon on Dark & Scale Sizes -->
+        <div class="card">
+          <div class="card-label">STANDALONE N ICON &bull; SCALING SIZES</div>
+          <div class="display-dark grid-pattern" style="height: 180px;">
+            <div class="size-row">
+              <div class="size-item">
+                <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
+                  <path d="M 15 52 L 15 20 C 15 15.5 18 12 22.5 12 C 25.5 12 28.5 13.8 30.5 16.5 L 47 40"
+                        stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#0a0a0c" stroke-width="14" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#A1A1AA" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+                <span class="size-label">48px (Docs / Nav)</span>
+              </div>
+              <div class="size-item">
+                <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+                  <path d="M 15 52 L 15 20 C 15 15.5 18 12 22.5 12 C 25.5 12 28.5 13.8 30.5 16.5 L 47 40"
+                        stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#0a0a0c" stroke-width="14" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#A1A1AA" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+                <span class="size-label">32px (Favicon)</span>
+              </div>
+              <div class="size-item">
+                <svg width="20" height="20" viewBox="0 0 64 64" fill="none">
+                  <path d="M 15 52 L 15 20 C 15 15.5 18 12 22.5 12 C 25.5 12 28.5 13.8 30.5 16.5 L 47 40"
+                        stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#0a0a0c" stroke-width="15" stroke-linecap="round"/>
+                  <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                        stroke="#A1A1AA" stroke-width="9" stroke-linecap="round"/>
+                </svg>
+                <span class="size-label">20px (CLI badge)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- App Icon Squircle -->
+        <div class="card">
+          <div class="card-label">APP ICON &bull; SQUIRCLE EMBED</div>
+          <div class="display-dark grid-pattern" style="height: 180px;">
+            <div class="squircle">
+              <svg width="58" height="58" viewBox="0 0 64 64" fill="none">
+                <path d="M 15 52 L 15 20 C 15 15.5 18 12 22.5 12 C 25.5 12 28.5 13.8 30.5 16.5 L 47 40"
+                      stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+                <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                      stroke="#14151b" stroke-width="14" stroke-linecap="round"/>
+                <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                      stroke="#A1A1AA" stroke-width="8" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. Alternative Concepts Considered -->
+    <div class="section">
+      <div class="section-title">04 &bull; Alternative N-Symbol Explorations</div>
+      <div class="grid-4">
+
+        <!-- Alt 1 -->
+        <div class="card">
+          <div class="card-label">CONCEPT 1 (PRIMARY)</div>
+          <div class="display-dark" style="height: 110px;">
+            <svg width="44" height="44" viewBox="0 0 64 64" fill="none">
+              <path d="M 15 52 L 15 20 C 15 15.5 18 12 22.5 12 C 25.5 12 28.5 13.8 30.5 16.5 L 47 40"
+                    stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+              <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                    stroke="#0a0a0c" stroke-width="14" stroke-linecap="round"/>
+              <path d="M 17 24 L 33.5 47.5 C 35.5 50.2 38.5 52 41.5 52 C 46 52 49 48.5 49 44 L 49 12"
+                    stroke="#A1A1AA" stroke-width="8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">Dual interlocking strokes with summit chamfer.</p>
+        </div>
+
+        <!-- Alt 2 -->
+        <div class="card">
+          <div class="card-label">CONCEPT 2 &bull; MÖBIUS</div>
+          <div class="display-dark" style="height: 110px;">
+            <svg width="44" height="44" viewBox="0 0 64 64" fill="none">
+              <path d="M 16 52 L 16 18 C 16 14 20 12 24 12 C 27 12 30 14 32 17 L 40 47 C 42 50 45 52 48 52 C 52 52 56 49 56 44 L 56 12"
+                    stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">Continuous ribbon line representing payment flow.</p>
+        </div>
+
+        <!-- Alt 3 -->
+        <div class="card">
+          <div class="card-label">CONCEPT 3 &bull; SOLID PRISMS</div>
+          <div class="display-dark" style="height: 110px;">
+            <svg width="44" height="44" viewBox="0 0 64 64" fill="none">
+              <path d="M 14 52 L 14 18 L 24 12 L 24 38 L 42 52 L 32 52 Z" fill="#FFFFFF"/>
+              <path d="M 50 12 L 50 46 L 40 52 L 40 26 L 22 12 L 32 12 Z" fill="#A1A1AA"/>
+            </svg>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">Solid geometric facets with angled Himalayan cuts.</p>
+        </div>
+
+        <!-- Alt 4 -->
+        <div class="card">
+          <div class="card-label">CONCEPT 4 &bull; MONOLINE</div>
+          <div class="display-dark" style="height: 110px;">
+            <svg width="44" height="44" viewBox="0 0 64 64" fill="none">
+              <path d="M 16 52 L 16 14 L 24 14 L 44 50 L 52 50 L 52 14"
+                    stroke="#FFFFFF" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">Sharp unadorned developer monoline infrastructure.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 5. Developer Context Integration -->
+    <div class="section">
+      <div class="section-title">05 &bull; Real Developer Context</div>
+      <div class="terminal">
+        <div class="terminal-header">
+          <div class="t-dot"></div>
+          <div class="t-dot"></div>
+          <div class="t-dot"></div>
+        </div>
+        <span style="color: var(--text-muted);">$</span> <span style="color: #FFFFFF;">npm install nepay</span><br>
+        <span style="color: var(--green);">+ nepay@0.1.0</span><br>
+        <span style="color: var(--text-muted);">added 1 package (Zod) in 120ms</span><br><br>
+        <span style="color: var(--text-muted); font-size: 12px;">// In your backend API handler:</span><br>
+        <span style="color: #818cf8;">import</span> { initiatePayment, verifyPayment } <span style="color: #818cf8;">from</span> <span style="color: #34d399;">"nepay"</span>;
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

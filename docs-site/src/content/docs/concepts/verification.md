@@ -9,7 +9,7 @@ A dangerous mistake in Nepal payment integrations is fulfilling an order immedia
 A customer can tamper with browser redirect query parameters, simulate form submissions, or drop off before their bank actually debits funds.
 :::
 
-`unified-nepal-payments` strictly enforces **Mandatory Server-to-Server (S2S) Verification**.
+`nepay` strictly enforces **Mandatory Server-to-Server (S2S) Verification**.
 
 ## The Golden Fulfilment Rule
 

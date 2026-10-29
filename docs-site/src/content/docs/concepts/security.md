@@ -3,7 +3,7 @@ title: Security & Server-Only Keys
 description: Security principles and best practices for integrating payments without leaking credentials.
 ---
 
-Payment gateway integration errors frequently result in high-severity security vulnerabilities. `unified-nepal-payments` is built with a defense-in-depth architecture to eliminate common failure modes.
+Payment gateway integration errors frequently result in high-severity security vulnerabilities. `nepay` is built with a defense-in-depth architecture to eliminate common failure modes.
 
 ## ⚠️ The Server-Only Rule
 
@@ -31,7 +31,7 @@ The SDK adheres to a strict zero-leak logging discipline:
 
 When verifying eSewa callback signatures, standard string comparison (`a === b`) is vulnerable to **timing attacks**, where an attacker measures slight microsecond timing differences to infer byte values.
 
-`unified-nepal-payments` uses `crypto.timingSafeEqual`:
+`nepay` uses `crypto.timingSafeEqual`:
 
 ```ts
 import { timingSafeEqual } from "node:crypto";

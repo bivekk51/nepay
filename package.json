@@ -1,7 +1,7 @@
 {
-  "name": "unified-nepal-payments",
+  "name": "nepay",
   "version": "0.1.0",
-  "description": "Unified Nepal Payments SDK (eSewa + Khalti)",
+  "description": "Developer-first unified Nepal payments SDK (eSewa + Khalti)",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -35,11 +35,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bivekk51/nepal-payment-sdk.git"
+    "url": "https://github.com/bivekk51/nepay.git"
   },
-  "homepage": "https://github.com/bivekk51/nepal-payment-sdk#readme",
+  "homepage": "https://github.com/bivekk51/nepay#readme",
   "bugs": {
-    "url": "https://github.com/bivekk51/nepal-payment-sdk/issues"
+    "url": "https://github.com/bivekk51/nepay/issues"
   },
   "engines": {
     "node": ">=18"
