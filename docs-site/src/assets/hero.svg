@@ -49,8 +49,8 @@
   <text x="54" y="102" font-family="'JetBrains Mono', monospace" font-size="12" fill="#818CF8">import</text>
   <text x="105" y="102" font-family="'JetBrains Mono', monospace" font-size="12" fill="#E4E4E7">{ initiatePayment }</text>
   <text x="250" y="102" font-family="'JetBrains Mono', monospace" font-size="12" fill="#818CF8">from</text>
-  <text x="290" y="102" font-family="'JetBrains Mono', monospace" font-size="12" fill="#34D399">"nepay"</text>
-  <text x="342" y="102" font-family="'JetBrains Mono', monospace" font-size="12" fill="#71717A">;</text>
+  <text x="290" y="102" font-family="'JetBrains Mono', monospace" font-size="12" fill="#34D399">"@bivekkk/nepay"</text>
+  <text x="410" y="102" font-family="'JetBrains Mono', monospace" font-size="12" fill="#71717A">;</text>
 
   <!-- Card Body Flow -->
   <rect x="54" y="125" width="432" height="195" rx="8" fill="#0a0a0c" stroke="#1c1d22" stroke-width="1"/>

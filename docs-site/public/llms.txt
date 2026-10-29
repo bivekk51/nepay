@@ -2,7 +2,7 @@
 
 > Developer-first, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
 
-- **Package**: `nepay`
+- **Package**: `@bivekkk/nepay`
 - **License**: MIT
 - **Runtime**: Node 18+, Bun, Deno, Next.js Server Actions, Express.js
 - **Full Docs File**: https://nepay.nepalbivek.com.np/llms-full.txt
@@ -16,16 +16,16 @@
 
 ## Installation
 ```bash
-npm install nepay
+npm install @bivekkk/nepay
 # or
-pnpm add nepay
+pnpm add @bivekkk/nepay
 # or
-bun add nepay
+bun add @bivekkk/nepay
 ```
 
 ## Quick Example
 ```ts
-import { initiatePayment, verifyPayment, type EsewaConfig, type KhaltiConfig } from "nepay";
+import { initiatePayment, verifyPayment, type EsewaConfig, type KhaltiConfig } from "@bivekkk/nepay";
 
 // 1. Initiate eSewa checkout (returns form URL & signed fields)
 const esewa = await initiatePayment({

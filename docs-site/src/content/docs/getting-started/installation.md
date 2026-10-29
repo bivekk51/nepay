@@ -11,16 +11,16 @@ Install the package using your favorite package manager:
 
 ```bash
 # npm
-npm install nepay
+npm install @bivekkk/nepay
 
 # pnpm
-pnpm add nepay
+pnpm add @bivekkk/nepay
 
 # yarn
-yarn add nepay
+yarn add @bivekkk/nepay
 
 # bun
-bun add nepay
+bun add @bivekkk/nepay
 ```
 
 ## Runtime Requirements

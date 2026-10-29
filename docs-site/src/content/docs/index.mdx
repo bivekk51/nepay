@@ -15,14 +15,14 @@ A developer-first, typesafe, server-side TypeScript SDK for integrating Nepal's 
 Install via your preferred package manager (Node 18+ required):
 
 ```bash
-npm install nepay
+npm install @bivekkk/nepay
 ```
 
 ```bash
 # Alternative package managers
-pnpm add nepay
-yarn add nepay
-bun add nepay
+pnpm add @bivekkk/nepay
+yarn add @bivekkk/nepay
+bun add @bivekkk/nepay
 ```
 
 ## First Payment in 60 Seconds
@@ -32,7 +32,7 @@ The SDK provides two core functions: `initiatePayment()` and `verifyPayment()`. 
 ### Step 1: Initiate Payment
 
 ```ts
-import { initiatePayment } from "nepay";
+import { initiatePayment } from "@bivekkk/nepay";
 
 // 1. Initiate eSewa payment
 const checkout = await initiatePayment({
@@ -68,7 +68,7 @@ const checkout = await initiatePayment({
 When the customer finishes payment, eSewa redirects back to your `successUrl` with a base64 encoded payload. `verifyPayment()` validates the signature and queries eSewa's status endpoint to confirm receipt before marking the order complete.
 
 ```ts
-import { verifyPayment } from "nepay";
+import { verifyPayment } from "@bivekkk/nepay";
 
 // 2. Verify eSewa callback on your server
 const result = await verifyPayment({

@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/nepay"><img src="https://img.shields.io/npm/v/nepay.svg" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@bivekkk/nepay"><img src="https://img.shields.io/npm/v/@bivekkk/nepay.svg" alt="npm version"></a>
   <a href="https://github.com/bivekk51/nepay"><img src="https://img.shields.io/badge/GitHub-nepay-181717.svg?logo=github" alt="GitHub Repository"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg" alt="Node.js Version"></a>
@@ -34,7 +34,7 @@ All monetary amounts are strictly **integer paisa** (`1 NPR = 100 paisa`) to eli
 ## Install
 
 ```bash
-npm install nepay
+npm install @bivekkk/nepay
 ```
 
 Requires Node >= 18 (global `fetch` and `node:crypto`).
@@ -98,7 +98,7 @@ Only fulfil a Khalti order when `verifyPayment` returns `status: "completed"` â€
 ## Unified usage
 
 ```ts
-import { initiatePayment, verifyPayment } from "nepay";
+import { initiatePayment, verifyPayment } from "@bivekkk/nepay";
 
 // eSewa form fields â€” initiatePayment returns a union, so narrow it:
 const esewa = await initiatePayment({ method: "esewa", config: esewaConfig, order: { orderId, amountPaisa } });
