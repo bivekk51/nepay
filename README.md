@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/nepay-banner.svg" alt="nepay - unified Nepal payment SDK" width="100%">
+  <img src="https://nepay.nepalbivek.com.np/nepay-banner.svg" alt="nepay - unified Nepal payment SDK" width="100%">
 </p>
 
 <p align="center">
