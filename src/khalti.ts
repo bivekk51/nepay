@@ -8,6 +8,7 @@ export const KHALTI_BASES = {
 
 export const KhaltiConfigSchema = z.object({
   secretKey: z.string().min(1),
+  publicKey: z.string().optional(),
   websiteUrl: z.string().url(),
   returnUrl: z.string().url(),
   env: z.enum(["sandbox", "production"]),
@@ -217,16 +218,24 @@ export async function verifyKhaltiPayment(opts: VerifyKhaltiPaymentOpts): Promis
     return { ...base, status: "failed" };
   }
 
+  if (lookup.status === "Expired") {
+    return { ...base, status: "expired" };
+  }
+  if (lookup.status === "User canceled") {
+    return { ...base, status: "canceled" };
+  }
+
+  // Amount binding: if total_amount is known and does not match expected, fail immediately.
+  if (Number.isFinite(lookup.total_amount) && lookup.total_amount !== opts.expectedAmountPaisa) {
+    return { ...base, status: "failed" };
+  }
+
   switch (lookup.status) {
     case "Completed":
-      return { ...base, status: lookup.total_amount === opts.expectedAmountPaisa ? "completed" : "failed" };
+      return { ...base, status: "completed" };
     case "Pending":
     case "Initiated":
       return { ...base, status: "pending" };
-    case "Expired":
-      return { ...base, status: "expired" };
-    case "User canceled":
-      return { ...base, status: "canceled" };
     case "Refunded":
     case "Partially Refunded":
       return { ...base, status: "failed" };
