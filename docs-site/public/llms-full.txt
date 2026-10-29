@@ -1,0 +1,361 @@
+# Unified Nepal Payments - Complete Documentation
+
+> Unified, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
+
+Package: `unified-nepal-payments`
+Version: `0.1.0`
+License: MIT
+Repository: https://github.com/bivss/unified-nepal-payments
+
+---
+
+## 1. Quickstart & Basic Usage
+
+### Installation
+```bash
+npm install unified-nepal-payments
+# or
+pnpm add unified-nepal-payments
+# or
+bun add unified-nepal-payments
+```
+
+### Core Philosophy: The Paisa Rule
+All monetary amounts are strictly in **integer paisa**.
+- NPR 100.00 = 10000 paisa
+- NPR 10.00 = 1000 paisa (Khalti minimum)
+- NPR 1250.50 = 125050 paisa
+Never use floating point numbers (`100.00`) to avoid floating point math drift in JavaScript.
+
+Built-in conversion utilities:
+```ts
+import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "unified-nepal-payments";
+
+nprToPaisa(123.45); // => 12345
+paisaToRupeesString(12345); // => "123.45"
+parseAmountToPaisa("1,000.0"); // => 100000 (safely handles eSewa commas!)
+```
+
+### 1. Unified Initiate Payment
+```ts
+import { initiatePayment } from "unified-nepal-payments";
+
+// eSewa Initiate
+const esewaCheckout = await initiatePayment({
+  method: "esewa",
+  config: {
+    productCode: process.env.ESEWA_PRODUCT_CODE || "EPAYTEST",
+    secretKey: process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q",
+    successUrl: "https://yourdomain.com/api/payment/callback/esewa",
+    failureUrl: "https://yourdomain.com/api/payment/callback/esewa",
+    env: "sandbox", // "sandbox" | "production"
+  },
+  order: {
+    orderId: "INV-2024-001",
+    amountPaisa: 10000, // NPR 100.00
+  },
+});
+// esewaCheckout returns:
+// {
+//   url: "https://rc-epay.esewa.com.np/api/epay/main/v2/form",
+//   fields: { amount, tax_amount, total_amount, transaction_uuid, product_code, signature, ... }
+// }
+
+// Khalti Initiate
+const khaltiCheckout = await initiatePayment({
+  method: "khalti",
+  config: {
+    secretKey: process.env.KHALTI_SECRET_KEY!,
+    websiteUrl: "https://yourdomain.com",
+    returnUrl: "https://yourdomain.com/api/payment/callback/khalti",
+    env: "sandbox", // "sandbox" | "production"
+  },
+  order: {
+    orderId: "INV-2024-001",
+    amountPaisa: 10000, // NPR 100.00
+    purchaseOrderName: "Store Order #001",
+    customerInfo: {
+      name: "Ram Sharma",
+      email: "ram@example.com",
+      phone: "9800000000",
+    },
+  },
+});
+// khaltiCheckout returns:
+// {
+//   pidx: "XXXXXX",
+//   payment_url: "https://test-pay.khalti.com/?pidx=XXXXXX",
+//   expires_at: "...",
+//   expires_in: 1800
+// }
+```
+
+### 2. Mandatory Server-to-Server (S2S) Verification
+Never trust browser redirect parameters! An attacker can spoof `status=Completed` in query strings. `verifyPayment()` always contacts the official gateway server directly before granting `status: "completed"`.
+
+```ts
+import { verifyPayment } from "unified-nepal-payments";
+
+// eSewa S2S Verification
+const verifiedEsewa = await verifyPayment({
+  method: "esewa",
+  config: {
+    productCode: process.env.ESEWA_PRODUCT_CODE || "EPAYTEST",
+    secretKey: process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q",
+    env: "sandbox",
+  },
+  data: req.query.data as string, // base64 response from eSewa
+  expectedOrderId: "INV-2024-001",
+  expectedAmountPaisa: 10000,
+});
+
+if (verifiedEsewa.status === "completed") {
+  // Safe to mark paid in DB
+  console.log("eSewa Payment Verified. Ref ID:", verifiedEsewa.traceId);
+}
+
+// Khalti S2S Verification
+const verifiedKhalti = await verifyPayment({
+  method: "khalti",
+  config: {
+    secretKey: process.env.KHALTI_SECRET_KEY!,
+    env: "sandbox",
+  },
+  pidx: req.query.pidx as string,
+  expectedOrderId: "INV-2024-001",
+  expectedAmountPaisa: 10000,
+});
+
+if (verifiedKhalti.status === "completed") {
+  // Safe to mark paid in DB
+  console.log("Khalti Payment Verified. Ref ID:", verifiedKhalti.traceId);
+}
+```
+
+---
+
+## 2. Gateway Specifics & Quirks
+
+### eSewa (ePay v2)
+1. **Signature Formula**:
+   Generated with HMAC-SHA256 formatted as base64 string:
+   `total_amount,transaction_uuid,product_code`
+2. **Form Submission**:
+   eSewa v2 requires an HTML form POST with inputs:
+   - `amount`, `tax_amount`, `product_service_charge`, `product_delivery_charge`, `total_amount`
+   - `transaction_uuid`, `product_code`, `success_url`, `failure_url`, `signed_field_names`, `signature`
+3. **Comma Formatting Quirk**:
+   When eSewa returns callback or status check, amounts can arrive with commas like `"1,000.0"`. `unified-nepal-payments` handles this automatically:
+   - Verifies signature against the raw string.
+   - Parses to paisa using `parseAmountToPaisa()` for comparison.
+   - Normalizes to plain decimal string before calling status endpoint.
+4. **GET vs POST Callbacks**:
+   In some environments eSewa delivers GET queries, in others POST forms. SDK accepts `{ data: string }` from either `req.query.data` or `req.body.data`.
+5. **Status API Endpoint**:
+   `https://rc.esewa.com.np/api/epay/transaction/status/?product_code=...&total_amount=...&transaction_uuid=...`
+
+### Khalti (ePayment v2)
+1. **Authorization Header**:
+   Requires `Authorization: Key <secretKey>`.
+2. **Initiate Endpoint**:
+   POST `https://dev.khalti.com/api/v2/epayment/initiate/` (Sandbox)
+   POST `https://khalti.com/api/v2/epayment/initiate/` (Production)
+3. **Lookup Endpoint**:
+   POST `https://dev.khalti.com/api/v2/epayment/lookup/` with body `{ "pidx": "<pidx>" }`.
+4. **HTTP 400 Expired Body Quirk**:
+   When a payment session expires on Khalti, the gateway returns HTTP 400 with body `{ "status": "Expired" }`. Instead of throwing an unhandled exception, `lookupKhalti()` and `verifyKhaltiPayment()` safely decode this body and return `{ status: "failed", raw: ... }`.
+5. **Sandbox Credentials**:
+   Create a free test account at https://test-admin.khalti.com/#/join/merchant to obtain your test secret key.
+
+---
+
+## 3. Express.js Production Recipe
+```ts
+import express from "express";
+import { initiatePayment, verifyPayment } from "unified-nepal-payments";
+
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Checkout Endpoint
+app.post("/api/checkout", async (req, res) => {
+  const { method, orderId, amountPaisa } = req.body;
+  
+  if (method === "esewa") {
+    const result = await initiatePayment({
+      method: "esewa",
+      config: {
+        productCode: process.env.ESEWA_PRODUCT_CODE || "EPAYTEST",
+        secretKey: process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q",
+        successUrl: `${process.env.APP_URL}/api/payment/callback/esewa`,
+        failureUrl: `${process.env.APP_URL}/api/payment/callback/esewa`,
+        env: "sandbox",
+      },
+      order: { orderId, amountPaisa },
+    });
+    return res.json({ method: "esewa", ...result });
+  }
+
+  if (method === "khalti") {
+    const result = await initiatePayment({
+      method: "khalti",
+      config: {
+        secretKey: process.env.KHALTI_SECRET_KEY!,
+        websiteUrl: process.env.APP_URL!,
+        returnUrl: `${process.env.APP_URL}/api/payment/callback/khalti`,
+        env: "sandbox",
+      },
+      order: { orderId, amountPaisa, purchaseOrderName: `Order ${orderId}` },
+    });
+    return res.json({ method: "khalti", paymentUrl: result.payment_url, pidx: result.pidx });
+  }
+});
+
+// eSewa Callback (Handles both GET & POST)
+app.all("/api/payment/callback/esewa", async (req, res) => {
+  const data = (req.query.data || req.body.data) as string;
+  const result = await verifyPayment({
+    method: "esewa",
+    config: {
+      productCode: process.env.ESEWA_PRODUCT_CODE || "EPAYTEST",
+      secretKey: process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q",
+      env: "sandbox",
+    },
+    callbackData: { data },
+    expectedOrderId: "INV-2024-001",
+    expectedAmountPaisa: 10000,
+  });
+
+  if (result.status === "completed") {
+    return res.redirect(`/payment/success?ref=${result.refId}`);
+  }
+  return res.redirect(`/payment/failed?reason=${result.message}`);
+});
+
+// Khalti Callback
+app.get("/api/payment/callback/khalti", async (req, res) => {
+  const pidx = req.query.pidx as string;
+  const result = await verifyPayment({
+    method: "khalti",
+    config: {
+      secretKey: process.env.KHALTI_SECRET_KEY!,
+      env: "sandbox",
+    },
+    callbackData: { pidx },
+    expectedOrderId: "INV-2024-001",
+    expectedAmountPaisa: 10000,
+  });
+
+  if (result.status === "completed") {
+    return res.redirect(`/payment/success?ref=${result.refId}`);
+  }
+  return res.redirect(`/payment/failed?reason=${result.message}`);
+});
+```
+
+---
+
+## 4. Next.js 14/15 App Router Recipe
+
+### Server Action (`app/actions/checkout.ts`)
+```ts
+"use server";
+
+import { initiatePayment } from "unified-nepal-payments";
+import { redirect } from "next/navigation";
+
+export async function checkoutAction(formData: FormData) {
+  const method = formData.get("method") as "esewa" | "khalti";
+  const orderId = `INV-${Date.now()}`;
+  const amountPaisa = 10000; // NPR 100.00
+
+  if (method === "khalti") {
+    const result = await initiatePayment({
+      method: "khalti",
+      config: {
+        secretKey: process.env.KHALTI_SECRET_KEY!,
+        websiteUrl: process.env.NEXT_PUBLIC_APP_URL!,
+        returnUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/payment/callback/khalti`,
+        env: "sandbox",
+      },
+      order: { orderId, amountPaisa, purchaseOrderName: `Order ${orderId}` },
+    });
+    redirect(result.payment_url);
+  }
+}
+```
+
+### Route Handler: eSewa Callback (`app/api/payment/callback/esewa/route.ts`)
+```ts
+import { NextRequest, NextResponse } from "next/server";
+import { verifyPayment } from "unified-nepal-payments";
+
+export async function GET(req: NextRequest) {
+  const data = req.nextUrl.searchParams.get("data");
+  if (!data) return NextResponse.redirect(new URL("/payment/failed", req.url));
+
+  const result = await verifyPayment({
+    method: "esewa",
+    config: {
+      productCode: process.env.ESEWA_PRODUCT_CODE || "EPAYTEST",
+      secretKey: process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q",
+      env: "sandbox",
+    },
+    callbackData: { data },
+    expectedOrderId: "INV-1001",
+    expectedAmountPaisa: 10000,
+  });
+
+  if (result.status === "completed") {
+    return NextResponse.redirect(new URL(`/payment/success?ref=${result.refId}`, req.url));
+  }
+  return NextResponse.redirect(new URL("/payment/failed", req.url));
+}
+
+export async function POST(req: NextRequest) {
+  const formData = await req.formData();
+  const data = formData.get("data") as string;
+  // Same verification logic as GET
+}
+```
+
+---
+
+## 5. API Reference Summary
+
+### `initiatePayment(input)`
+- Inputs:
+  - `method: "esewa" | "khalti"`
+  - `config`: Gateway credentials (`EsewaConfig` or `KhaltiConfig`)
+  - `order`: Order metadata (`orderId`, `amountPaisa`, `purchaseOrderName`, `customerInfo`)
+- Returns:
+  - For eSewa: `{ url: string, fields: Record<string, string> }` (for auto-submitting POST form)
+  - For Khalti: `{ pidx: string, payment_url: string, expires_at: string, expires_in: number }`
+
+### `verifyPayment(input)`
+- Inputs:
+  - `method: "esewa" | "khalti"`
+  - `config`: Gateway credentials
+  - `callbackData`: `{ data: string }` for eSewa, `{ pidx: string }` for Khalti
+  - `expectedOrderId`: string
+  - `expectedAmountPaisa`: number (integer paisa)
+- Returns: `PaymentResult`
+  - `status`: `"completed" | "pending" | "failed" | "ambiguous"`
+  - `orderId`: string
+  - `amountPaisa`: number
+  - `refId`: string | undefined
+  - `message`: string | undefined
+  - `raw`: unknown
+
+### Low-Level Utilities
+- `signEpayV2(params, secretKey)`: Generates raw HMAC-SHA256 signature for eSewa v2.
+- `buildEsewaFields(order, config)`: Constructs all form payload fields and signature.
+- `checkEpayStatus(opts)`: Queries eSewa status verification endpoint.
+- `initiateKhalti(order, config)`: Directly calls Khalti `/epayment/initiate/`.
+- `lookupKhalti(pidx, config)`: Directly calls Khalti `/epayment/lookup/`.
+- `verifyEsewaPayment(opts)`: Standalone eSewa callback & S2S verifier.
+- `verifyKhaltiPayment(opts)`: Standalone Khalti pidx lookup & verifier.
+- `nprToPaisa(npr)`: Safe float to integer paisa conversion.
+- `paisaToRupeesString(paisa)`: Paisa to formatted rupees string.
+- `parseAmountToPaisa(raw)`: Comma-resilient amount parser.

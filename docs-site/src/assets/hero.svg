@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="200" r="160" fill="url(#grad)" opacity="0.15" />
+  <rect x="80" y="110" width="240" height="150" rx="20" fill="url(#grad)" />
+  <rect x="80" y="145" width="240" height="35" fill="#1e1b4b" opacity="0.4" />
+  <circle cx="120" cy="215" r="14" fill="#fbbf24" />
+  <circle cx="145" cy="215" r="14" fill="#f59e0b" opacity="0.8" />
+  <text x="200" y="320" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#6366f1" text-anchor="middle">NPR 100.00</text>
+</svg>

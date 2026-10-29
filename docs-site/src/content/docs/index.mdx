@@ -1,0 +1,167 @@
+---
+title: "Unified Nepal Payments"
+description: "Unified, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2)."
+editUrl: false
+---
+
+A unified, typesafe, server-side TypeScript SDK for integrating Nepal's leading digital payment gateways: **eSewa (ePay v2)** and **Khalti (ePayment v2)**. Built for modern backend runtimes with strict integer paisa arithmetic, mandatory server-to-server (S2S) verification, and zero client-side credential leaks.
+
+## Quick Installation
+
+Install via your preferred package manager (Node 18+ required):
+
+```bash
+npm install unified-nepal-payments
+```
+
+```bash
+# Alternative package managers
+pnpm add unified-nepal-payments
+yarn add unified-nepal-payments
+bun add unified-nepal-payments
+```
+
+## First Payment in 60 Seconds
+
+The SDK provides two core functions: `initiatePayment()` and `verifyPayment()`. Passing `method: "esewa"` or `method: "khalti"` automatically discriminates input parameters and return types with full TypeScript intellisense.
+
+### Step 1: Initiate Payment
+
+```ts
+import { initiatePayment } from "unified-nepal-payments";
+
+// 1. Initiate eSewa payment
+const checkout = await initiatePayment({
+  method: "esewa",
+  config: {
+    productCode: process.env.ESEWA_PRODUCT_CODE || "EPAYTEST",
+    secretKey: process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q",
+    successUrl: "https://yourdomain.com/api/payment/callback/esewa",
+    failureUrl: "https://yourdomain.com/api/payment/callback/esewa",
+    env: "sandbox",
+  },
+  order: {
+    orderId: "INV-2024-001",
+    amountPaisa: 10000, // NPR 100.00 (float-safe integer paisa)
+  },
+});
+
+// Returns form target URL and cryptographic HMAC-SHA256 signature fields:
+// { url: "https://rc-epay.esewa.com.np/api/epay/main/v2/form", fields: { ... } }
+```
+
+#### Line-by-Line Breakdown
+- `method: "esewa"`: Discriminates the input schema using Zod, ensuring only eSewa-specific options are accepted and returning `{ url, fields }`.
+- `config.productCode`: Your merchant identifier (`"EPAYTEST"` in UAT sandbox).
+- `config.secretKey`: The HMAC secret key used for signing payload fields. **Keep this server-side only**.
+- `order.orderId`: Unique transaction ID in your database (`transaction_uuid` in eSewa).
+- `order.amountPaisa`: Always integer paisa. `10000` paisa represents exactly `NPR 100.00`.
+
+---
+
+### Step 2: Mandatory Server-to-Server Verification
+
+When the customer finishes payment, eSewa redirects back to your `successUrl` with a base64 encoded payload. `verifyPayment()` validates the signature and queries eSewa's status endpoint to confirm receipt before marking the order complete.
+
+```ts
+import { verifyPayment } from "unified-nepal-payments";
+
+// 2. Verify eSewa callback on your server
+const result = await verifyPayment({
+  method: "esewa",
+  config: {
+    productCode: process.env.ESEWA_PRODUCT_CODE || "EPAYTEST",
+    secretKey: process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q",
+    env: "sandbox",
+  },
+  data: req.query.data as string, // Base64 payload from eSewa redirect
+  expectedOrderId: "INV-2024-001",
+  expectedAmountPaisa: 10000,
+});
+
+if (result.status === "completed") {
+  // Safe to mark paid in your database
+  console.log("Payment confirmed! Gateway Ref ID:", result.traceId);
+} else {
+  console.error("Verification failed:", result.status);
+}
+```
+
+#### Why S2S Verification is Mandatory
+Browser redirects can be intercepted, spoofed, or replayed by malicious users. The SDK guarantees:
+1. **Timing-Safe HMAC Check**: Validates the cryptographic digest with `crypto.timingSafeEqual` against the received raw string.
+2. **Gateway Lookup**: Queries the gateway's server endpoint to verify the transaction status and amount.
+3. **Exact Amount Match**: Checks that the paid amount matches `expectedAmountPaisa` to the exact paisa.
+
+---
+
+## Gateway Support Matrix
+
+| Gateway | Protocol / Version | Initiate Mechanism | Verification Mechanism | Environment |
+|---|---|---|---|---|
+| **eSewa** | ePay v2 | HTML Form POST + HMAC-SHA256 | S2S Status API + Base64 Callback | Sandbox (UAT) & Production |
+| **Khalti** | ePayment v2 (KPG-2) | REST JSON (`/epayment/initiate/`) | S2S Lookup API (`/epayment/lookup/`) | Sandbox & Production |
+| **FonePay** | Dynamic QR / Web | Direct Merchant API | Webhook + S2S Query | Phase 2 Roadmap |
+
+---
+
+## Core Principles
+
+- **Float-Safe Integer Paisa**: All amounts in the API are integer paisa (`1 NPR = 100 Paisa`). Eliminates JavaScript float drift (`0.1 + 0.2 !== 0.3`).
+- **Server-Only Security**: Secret keys never leak to frontend bundles. All cryptographic operations run inside Node.js or server runtimes.
+- **Resilient Formatting**: Automatic parsing of eSewa callback quirks (e.g. comma strings `"1,000.0"`), GET vs POST callback normalization, and Khalti HTTP 400 Expired body handling.
+- **Dual ESM & CommonJS**: Ships with dual entrypoints and TypeScript definition files for complete compatibility with Next.js, Remix, Express, NestJS, and Fastify.
+
+---
+
+## Next Steps
+
+<div class="guide-card-grid">
+  <a href="/getting-started/quickstart/" class="guide-card">
+    <div class="guide-card-title">
+      <span>5-Minute Quickstart</span>
+      <span class="arrow">&rarr;</span>
+    </div>
+    <p class="guide-card-desc">Step-by-step tutorial covering both eSewa and Khalti end-to-end lifecycles.</p>
+  </a>
+
+  <a href="/gateways/esewa/" class="guide-card">
+    <div class="guide-card-title">
+      <span>eSewa ePay v2 Guide</span>
+      <span class="arrow">&rarr;</span>
+    </div>
+    <p class="guide-card-desc">Form POST auto-submission, signature generation, and GET/POST callback resolution.</p>
+  </a>
+
+  <a href="/gateways/khalti/" class="guide-card">
+    <div class="guide-card-title">
+      <span>Khalti ePayment v2 Guide</span>
+      <span class="arrow">&rarr;</span>
+    </div>
+    <p class="guide-card-desc">REST initiate, pidx lookup verification, sandbox credentials, and expired state handling.</p>
+  </a>
+
+  <a href="/recipes/express/" class="guide-card">
+    <div class="guide-card-title">
+      <span>Express.js Recipe</span>
+      <span class="arrow">&rarr;</span>
+    </div>
+    <p class="guide-card-desc">Production Express server with checkout endpoints, callback routes, and database patterns.</p>
+  </a>
+
+  <a href="/recipes/nextjs/" class="guide-card">
+    <div class="guide-card-title">
+      <span>Next.js App Router Recipe</span>
+      <span class="arrow">&rarr;</span>
+    </div>
+    <p class="guide-card-desc">Modern Next.js 14/15 implementation using Server Actions and Route Handlers.</p>
+  </a>
+
+  <a href="/reference/api/" class="guide-card">
+    <div class="guide-card-title">
+      <span>API Reference</span>
+      <span class="arrow">&rarr;</span>
+    </div>
+    <p class="guide-card-desc">Complete method signatures, parameter tables, and TypeScript types.</p>
+  </a>
+</div>
