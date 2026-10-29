@@ -8,13 +8,27 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "nepal",
+    "payments",
+    "esewa",
+    "khalti",
+    "epay",
+    "epayment",
+    "nepal-payments",
+    "sdk",
+    "typescript",
+    "fintech"
   ],
   "publishConfig": {
     "access": "public"
@@ -24,8 +38,13 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "test": "vitest run --exclude '**/*live*'",
+    "test:all": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run",
+    "test:live": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run tests/live.test.ts",
+    "typecheck": "tsc --noEmit",
+    "docs:dev": "npm --prefix docs-site run dev",
+    "docs:build": "npm --prefix docs-site run build",
+    "docs:preview": "npm --prefix docs-site run preview"
   },
   "dependencies": {
     "zod": "^3.23.8"
