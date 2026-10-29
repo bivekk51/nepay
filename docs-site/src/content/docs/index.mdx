@@ -4,18 +4,9 @@ description: "Developer-first, typesafe, server-side TypeScript SDK for Nepal pa
 editUrl: false
 ---
 
-import { Image } from 'astro:assets';
-import heroImage from '../../assets/hero.svg';
+import HeroDiagram from '../../components/HeroDiagram.astro';
 
-<div style="margin: 1.5rem 0 2rem 0; width: 100%;">
-  <Image 
-    src={heroImage} 
-    alt="Nepay payment gateway architecture and verification flow" 
-    width={540} 
-    height={380} 
-    style="width: 100%; height: auto; border-radius: 12px; display: block;" 
-  />
-</div>
+<HeroDiagram />
 
 A developer-first, typesafe, server-side TypeScript SDK for integrating Nepal's leading digital payment gateways: **eSewa (ePay v2)** and **Khalti (ePayment v2)**. Built for modern backend runtimes with strict integer paisa arithmetic, mandatory server-to-server (S2S) verification, and zero client-side credential leaks.
 
