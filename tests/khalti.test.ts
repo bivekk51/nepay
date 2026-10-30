@@ -3,6 +3,7 @@ import {
   initiateKhalti,
   lookupKhalti,
   verifyKhaltiPayment,
+  getKhaltiCheckoutUrl,
   KHALTI_BASES,
   type KhaltiConfig,
 } from "../src/khalti.js";
@@ -209,5 +210,64 @@ describe("khalti", () => {
       expires_in: "3600",
     });
     await expect(initiateKhalti({ ...baseOpts })).rejects.toThrow(/malformed expires_in/);
+  });
+
+  it("forwards modes array in initiate body when specified", async () => {
+    const raw = {
+      pidx: "pidx-modes",
+      payment_url: "https://pay.khalti.com/?pidx=pidx-modes",
+      expires_at: "2026-01-01T00:00:00Z",
+      expires_in: 3600,
+    };
+    const fetchMock = stubFetch(raw);
+    await initiateKhalti({
+      config,
+      purchaseOrderId: "ORDER-MODES",
+      purchaseOrderName: "Test order",
+      amountPaisa: 10000,
+      modes: ["MOBILE_BANKING", "CONNECT_IPS", "KHALTI"],
+    });
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    const body = JSON.parse(String(init.body));
+    expect(body.modes).toEqual(["MOBILE_BANKING", "CONNECT_IPS", "KHALTI"]);
+  });
+
+  describe("getKhaltiCheckoutUrl", () => {
+    it("rewrites payment_url to specified channel route", () => {
+      const paymentUrl = "https://test-pay.khalti.com/?pidx=TEST-PIDX";
+      expect(getKhaltiCheckoutUrl(paymentUrl, "mobank")).toBe(
+        "https://test-pay.khalti.com/mobank?pidx=TEST-PIDX"
+      );
+      expect(getKhaltiCheckoutUrl(paymentUrl, "cips")).toBe(
+        "https://test-pay.khalti.com/cips?pidx=TEST-PIDX"
+      );
+      expect(getKhaltiCheckoutUrl(paymentUrl, "ebank")).toBe(
+        "https://test-pay.khalti.com/ebank?pidx=TEST-PIDX"
+      );
+      expect(getKhaltiCheckoutUrl(paymentUrl, "wallet")).toBe(
+        "https://test-pay.khalti.com/wallet?pidx=TEST-PIDX"
+      );
+      expect(getKhaltiCheckoutUrl(paymentUrl)).toBe(
+        "https://test-pay.khalti.com/?pidx=TEST-PIDX"
+      );
+    });
+
+    it("constructs direct checkout URL from raw pidx", () => {
+      expect(getKhaltiCheckoutUrl("RAW_PIDX_123", "mobank")).toBe(
+        "https://pay.khalti.com/mobank?pidx=RAW_PIDX_123"
+      );
+      expect(getKhaltiCheckoutUrl("RAW_PIDX_123", "cips", { env: "sandbox" })).toBe(
+        "https://test-pay.khalti.com/cips?pidx=RAW_PIDX_123"
+      );
+      expect(getKhaltiCheckoutUrl("RAW_PIDX_123", undefined, { env: "sandbox" })).toBe(
+        "https://test-pay.khalti.com/?pidx=RAW_PIDX_123"
+      );
+    });
+
+    it("throws on empty or non-string input", () => {
+      expect(() => getKhaltiCheckoutUrl("")).toThrow(TypeError);
+      // @ts-expect-error test invalid type
+      expect(() => getKhaltiCheckoutUrl(null)).toThrow(TypeError);
+    });
   });
 });

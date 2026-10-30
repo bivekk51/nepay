@@ -5,6 +5,7 @@ import {
   initiateKhalti,
   lookupKhalti,
   verifyKhaltiPayment,
+  getKhaltiCheckoutUrl,
   buildEsewaFields,
   checkEpayStatus,
   signEpayV2,
@@ -111,6 +112,41 @@ describe("Live Sandbox Integration Tests", { timeout: 20000 }, () => {
       });
 
       expect(result.status).toBe("failed");
+    });
+
+    it("initiates live transaction with banking modes and constructs direct channel checkout URLs", async () => {
+      const result = await initiatePayment({
+        method: "khalti",
+        config: khaltiConfig,
+        order: {
+          purchaseOrderId: `MODES-${Date.now()}`,
+          purchaseOrderName: "Direct Banking Test",
+          amountPaisa: 1500, // Rs 15
+          modes: ["MOBILE_BANKING", "CONNECT_IPS", "KHALTI"],
+        },
+      });
+
+      expect("pidx" in result).toBe(true);
+      if ("pidx" in result) {
+        expect(result.pidx).toBeTruthy();
+        expect(result.payment_url).toContain("https://test-pay.khalti.com/");
+
+        // Direct Mobile Banking checkout link
+        const mobankUrl = getKhaltiCheckoutUrl(result.payment_url, "mobank");
+        expect(mobankUrl).toBe(`https://test-pay.khalti.com/mobank?pidx=${result.pidx}`);
+
+        // Direct ConnectIPS checkout link
+        const cipsUrl = getKhaltiCheckoutUrl(result.payment_url, "cips");
+        expect(cipsUrl).toBe(`https://test-pay.khalti.com/cips?pidx=${result.pidx}`);
+
+        // Direct Wallet checkout link
+        const walletUrl = getKhaltiCheckoutUrl(result.payment_url, "wallet");
+        expect(walletUrl).toBe(`https://test-pay.khalti.com/wallet?pidx=${result.pidx}`);
+
+        // Construct from raw pidx with sandbox env
+        const directFromPidx = getKhaltiCheckoutUrl(result.pidx, "mobank", { env: "sandbox" });
+        expect(directFromPidx).toBe(`https://test-pay.khalti.com/mobank?pidx=${result.pidx}`);
+      }
     });
   });
 
