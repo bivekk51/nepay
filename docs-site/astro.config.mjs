@@ -23,6 +23,7 @@ export default defineConfig({
 				{ tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
 				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://nepay.nepalbivek.com.np/nepay-banner.svg' } },
 				{ tag: 'meta', attrs: { name: 'keywords', content: 'esewa integration nodejs, khalti integration nodejs, nepal payment gateway, esewa epay v2 typescript, khalti epayment v2, esewa sandbox credentials, nextjs payment nepal, nepay' } },
+				{ tag: 'meta', attrs: { name: 'google-site-verification', content: 'dYUwxTpYoS8yOT81kzgQ0awfEHl1pzv313zmCenKJMY' } },
 			],
 			customCss: ['./src/styles/custom.css'],
 			components: {
