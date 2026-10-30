@@ -1,0 +1,201 @@
+---
+import Default from '@astrojs/starlight/components/TableOfContents.astro';
+---
+
+<Default><slot /></Default>
+
+<script>
+  let isClassPatched = false;
+
+  function getTrueActiveHeading(): HTMLElement | null {
+    const headings = [...document.querySelectorAll('main h2[id], main h3[id]')] as HTMLElement[];
+    if (!headings.length) return null;
+
+    const scrollY = window.scrollY;
+    const innerHeight = window.innerHeight;
+    const scrollHeight = document.documentElement.scrollHeight;
+
+    // 1. Scrolled near or at the bottom of the page -> last heading is active
+    if (innerHeight + scrollY >= scrollHeight - 90) {
+      return headings[headings.length - 1];
+    }
+
+    // 2. Scrolled at or near the top -> return null for overview / top link
+    if (scrollY < 80) {
+      return null;
+    }
+
+    // 3. Special rule for last heading:
+    // If the last heading is already in the upper 45% of the viewport and no subsequent headings exist,
+    // the user is reading the final section.
+    const lastHeading = headings[headings.length - 1];
+    const lastRect = lastHeading.getBoundingClientRect();
+    if (lastRect.top <= innerHeight * 0.45) {
+      return lastHeading;
+    }
+
+    // 4. Standard reading threshold: find the latest heading that has reached <= 140px
+    const readingThreshold = 140;
+    let active: HTMLElement | null = null;
+    for (let i = 0; i < headings.length; i++) {
+      const h = headings[i];
+      const rect = h.getBoundingClientRect();
+      if (rect.top <= readingThreshold) {
+        active = h;
+      } else {
+        break;
+      }
+    }
+
+    return active || headings[0];
+  }
+
+  function patchStarlightTocClass() {
+    if (isClassPatched) return;
+
+    const applyPatch = (cls: any) => {
+      if (!cls || !cls.prototype) return;
+      const originalDesc = Object.getOwnPropertyDescriptor(cls.prototype, 'current');
+      if (!originalDesc || !originalDesc.set) return;
+
+      const originalSet = originalDesc.set;
+
+      Object.defineProperty(cls.prototype, 'current', {
+        get() {
+          return this._current;
+        },
+        set(link: HTMLAnchorElement) {
+          // 1. If click-locked, keep target link active
+          if (this._clickLockedLink && Date.now() < this._clickLockUntil) {
+            if (link !== this._clickLockedLink) return;
+            originalSet.call(this, link);
+            return;
+          }
+
+          // 2. Validate against the true active heading on the screen
+          const activeHeading = getTrueActiveHeading();
+          const links = [...this.querySelectorAll('a')] as HTMLAnchorElement[];
+
+          let targetLink = link;
+          if (!activeHeading) {
+            targetLink = links.find((l) => l.hash === '#_top' || !l.hash) || links[0];
+          } else {
+            const matchingLink = links.find(
+              (l) => l.hash === '#' + encodeURIComponent(activeHeading.id)
+            );
+            if (matchingLink) {
+              targetLink = matchingLink;
+            }
+          }
+
+          originalSet.call(this, targetLink);
+        },
+        configurable: true,
+        enumerable: true,
+      });
+
+      isClassPatched = true;
+    };
+
+    const StarlightTOC = customElements.get('starlight-toc');
+    if (StarlightTOC) {
+      applyPatch(StarlightTOC);
+    } else {
+      customElements.whenDefined('starlight-toc').then((cls) => applyPatch(cls));
+    }
+  }
+
+  function setupTocEnhancement() {
+    patchStarlightTocClass();
+
+    const tocs = document.querySelectorAll('starlight-toc, mobile-starlight-toc');
+    if (!tocs.length) return;
+
+    tocs.forEach((tocEl) => {
+      const toc = tocEl as any;
+      if (toc._enhanced) return;
+      toc._enhanced = true;
+
+      const links = [...toc.querySelectorAll('a')] as HTMLAnchorElement[];
+      if (!links.length) return;
+
+      const getHeadingId = (link: HTMLAnchorElement) => {
+        const hash = link.hash;
+        return hash ? decodeURIComponent(hash.slice(1)) : '';
+      };
+
+      const linkMap = new Map<string, HTMLAnchorElement>();
+      links.forEach((link) => {
+        const id = getHeadingId(link);
+        if (id) linkMap.set(id, link);
+      });
+
+      const setActive = (link: HTMLAnchorElement) => {
+        if (!link) return;
+        if (typeof toc.current !== 'undefined') {
+          toc.current = link;
+        } else {
+          links.forEach((l) => l.removeAttribute('aria-current'));
+          link.setAttribute('aria-current', 'true');
+        }
+      };
+
+      // Click handler: immediately lock to clicked link
+      links.forEach((link) => {
+        link.addEventListener('click', () => {
+          toc._clickLockedLink = link;
+          toc._clickLockUntil = Date.now() + 1000;
+          setActive(link);
+        });
+      });
+
+      // Release click lock early if user starts manually scrolling
+      const releaseLock = () => {
+        if (toc._clickLockedLink && Date.now() >= (toc._clickLockUntil || 0) - 400) {
+          toc._clickLockedLink = null;
+          toc._clickLockUntil = 0;
+        }
+      };
+      window.addEventListener('wheel', releaseLock, { passive: true });
+      window.addEventListener('touchmove', releaseLock, { passive: true });
+
+      const onScroll = () => {
+        const now = Date.now();
+        if (toc._clickLockedLink && now < toc._clickLockUntil) {
+          return;
+        }
+
+        const activeHeading = getTrueActiveHeading();
+        if (!activeHeading) {
+          const topLink = links.find((l) => l.hash === '#_top' || !l.hash) || links[0];
+          if (topLink) setActive(topLink);
+          return;
+        }
+
+        const targetLink = linkMap.get(activeHeading.id);
+        if (targetLink) {
+          setActive(targetLink);
+        }
+      };
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      // Handle initial load with hash or scroll position
+      if (window.location.hash) {
+        const initialId = decodeURIComponent(window.location.hash.slice(1));
+        const initialLink = linkMap.get(initialId);
+        if (initialLink) {
+          toc._clickLockedLink = initialLink;
+          toc._clickLockUntil = Date.now() + 800;
+          setActive(initialLink);
+        }
+      } else {
+        onScroll();
+      }
+    });
+  }
+
+  // Setup on page load and on Astro view transitions
+  setupTocEnhancement();
+  document.addEventListener('astro:page-load', setupTocEnhancement);
+</script>

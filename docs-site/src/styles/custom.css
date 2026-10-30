@@ -316,6 +316,7 @@ starlight-toc nav ul ul li a {
 	font-size: 0.95rem;
 	line-height: 1.7;
 	color: var(--sl-color-gray-2);
+	padding-bottom: clamp(14rem, 45vh, 32rem);
 }
 
 .sl-markdown-content h1 {
