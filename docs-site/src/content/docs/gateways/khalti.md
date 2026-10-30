@@ -69,7 +69,7 @@ export const khaltiConfig: KhaltiConfig = {
 Call `initiatePayment()` or the standalone function `initiateKhalti()`:
 
 ```ts title="src/routes/checkout.ts"
-import { initiatePayment } from "@bivekkk/nepay";
+import { initiatePayment, getKhaltiCheckoutUrl } from "@bivekkk/nepay";
 import { khaltiConfig } from "../lib/khalti.js";
 
 const result = await initiatePayment({
@@ -89,14 +89,20 @@ const result = await initiatePayment({
       { label: "Items Total", amount: 9000 },
       { label: "VAT (13%)", amount: 1000 },
     ],
+    // Optional: Enable or restrict payment channels (Wallet, Mobile Banking, ConnectIPS)
+    modes: ["KHALTI", "MOBILE_BANKING", "CONNECT_IPS"],
   },
 });
 
 // Store result.pidx in your database associated with INV-2024-001
 console.log("Payment Index (pidx):", result.pidx);
 
-// Redirect customer to Khalti hosted checkout
+// Option A: Redirect customer to multi-channel selector
 res.redirect(result.payment_url);
+
+// Option B: Deep-link directly to Mobile Banking bank grid
+// const mobankUrl = getKhaltiCheckoutUrl(result.payment_url, "mobank");
+// res.redirect(mobankUrl);
 ```
 
 ### Request Parameter Specifications
@@ -108,6 +114,7 @@ res.redirect(result.payment_url);
 | `purchaseOrderName` | <span class="param-type">string</span> | <span class="param-required">Required</span> | Human-readable title displayed on the Khalti checkout screen. |
 | `customerInfo` | <span class="param-type">object</span> | <span class="param-optional">Optional</span> | Details (`name`, `email`, `phone`) pre-filling the payment form. |
 | `amountBreakdown` | <span class="param-type">Array&lt;{label, amount}&gt;</span> | <span class="param-optional">Optional</span> | Itemized billing. The sum of item amounts must strictly equal `amountPaisa`. |
+| `modes` | <span class="param-type">Array&lt;KhaltiPaymentMode&gt;</span> | <span class="param-optional">Optional</span> | Restrict channels to `["KHALTI", "MOBILE_BANKING", "CONNECT_IPS", "EBANKING", "SCT"]`. |
 
 :::note[Pre-Flight Validation]
 The SDK performs local validation using Zod before issuing any network requests:
@@ -126,6 +133,78 @@ Upon successful initiation, Khalti responds with:
   "expires_at": "2026-10-29T14:15:22.000000Z",
   "expires_in": 1800
 }
+```
+
+---
+
+## Multi-Channel Banking: Mobile Banking & ConnectIPS
+
+Khalti's hosted checkout (`pay.khalti.com`) acts as an aggregator that supports multiple payment channels beyond the Khalti wallet:
+
+| Channel | Identifier | Route | Description |
+|---|---|---|---|
+| **Khalti Wallet** | `KHALTI` | `/wallet` | Digital wallet balance with MPIN + SMS OTP. |
+| **Mobile Banking** | `MOBILE_BANKING` | `/mobank` | Direct checkout from partner bank mobile banking apps (GlobalIME, Nabil, Everest, Citizens, etc.). |
+| **ConnectIPS** | `CONNECT_IPS` | `/cips` | Direct account-to-account debit powered by NCHL ConnectIPS. |
+| **e-Banking** | `EBANKING` | `/ebank` | Internet banking portals of partner commercial banks. |
+| **Cards** | `SCT` | `/sct` | SCT and card payment networks. |
+
+### 1. Multi-Option vs Channel-Restricted Initiation
+
+By default, if `modes` is omitted, Khalti displays all payment channels enabled on your merchant account on a unified selector screen (`https://pay.khalti.com/?pidx=...`).
+
+You can restrict checkout to specific channels by passing `modes`:
+
+```ts
+const result = await initiatePayment({
+  method: "khalti",
+  config: khaltiConfig,
+  order: {
+    orderId: "INV-2024-001",
+    amountPaisa: 5000,
+    purchaseOrderName: "Store Order #001",
+    // Restrict enabled channels:
+    modes: ["MOBILE_BANKING", "CONNECT_IPS", "KHALTI"],
+  },
+});
+```
+
+:::tip[Single Mode Auto-Routing]
+If you specify only one mode (e.g. `modes: ["MOBILE_BANKING"]`), Khalti's checkout application **automatically skips the method selection screen** and redirects the user directly to the bank grid (`/mobank?pidx=...`).
+:::
+
+### 2. Deep-Linking Direct Checkout URLs (`getKhaltiCheckoutUrl`)
+
+If your application provides its own UI for users to choose their payment method (e.g., "Pay via Mobile Banking" or "Pay via ConnectIPS"), you can use the `getKhaltiCheckoutUrl` helper to generate direct deep links:
+
+```ts
+import { initiatePayment, getKhaltiCheckoutUrl } from "@bivekkk/nepay";
+
+const result = await initiatePayment({
+  method: "khalti",
+  config: khaltiConfig,
+  order: {
+    orderId: "INV-2024-001",
+    amountPaisa: 5000,
+    purchaseOrderName: "Store Order #001",
+  },
+});
+
+// Direct to Mobile Banking (displays bank selector grid)
+const mobankUrl = getKhaltiCheckoutUrl(result.payment_url, "mobank");
+// => "https://pay.khalti.com/mobank?pidx=..."
+
+// Direct to ConnectIPS (prompts for mobile number -> redirects to NCHL)
+const cipsUrl = getKhaltiCheckoutUrl(result.payment_url, "cips");
+// => "https://pay.khalti.com/cips?pidx=..."
+
+// Direct to Khalti Wallet login form
+const walletUrl = getKhaltiCheckoutUrl(result.payment_url, "wallet");
+// => "https://pay.khalti.com/wallet?pidx=..."
+
+// You can also construct from a raw pidx:
+const directUrl = getKhaltiCheckoutUrl(result.pidx, "mobank", { env: "sandbox" });
+// => "https://test-pay.khalti.com/mobank?pidx=..."
 ```
 
 ---

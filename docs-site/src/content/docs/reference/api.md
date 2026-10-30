@@ -109,6 +109,16 @@ function verifyKhaltiPayment(opts: VerifyKhaltiPaymentOpts): Promise<PaymentResu
 ```
 Queries lookup and normalizes payment status to `PaymentResult`.
 
+### `getKhaltiCheckoutUrl(paymentUrlOrPidx, channel?, opts?)`
+```ts
+function getKhaltiCheckoutUrl(
+  paymentUrlOrPidx: string,
+  channel?: "wallet" | "mobank" | "cips" | "ebank" | "sct" | "visa",
+  opts?: { env?: "sandbox" | "production" }
+): string
+```
+Constructs a direct deep-link URL for Khalti checkout, targeting either the default multi-option selector or a specific direct channel (e.g. `/mobank` for Mobile Banking, `/cips` for ConnectIPS, `/wallet` for Khalti Wallet).
+
 ---
 
 ## Money Utilities
