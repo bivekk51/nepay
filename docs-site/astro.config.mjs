@@ -27,6 +27,7 @@ export default defineConfig({
 			customCss: ['./src/styles/custom.css'],
 			components: {
 				ThemeSelect: './src/components/ThemeSelect.astro',
+				Head: './src/components/Head.astro',
 			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bivekk51/nepay' }
