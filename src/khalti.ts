@@ -17,6 +17,25 @@ export const KhaltiConfigSchema = z.object({
 
 export type KhaltiConfig = z.infer<typeof KhaltiConfigSchema>;
 
+export const KhaltiPaymentModeSchema = z.enum([
+  "KHALTI",
+  "EBANKING",
+  "MOBILE_BANKING",
+  "CONNECT_IPS",
+  "SCT",
+]);
+export type KhaltiPaymentMode = z.infer<typeof KhaltiPaymentModeSchema>;
+
+export const KhaltiCheckoutChannelSchema = z.enum([
+  "wallet",
+  "mobank",
+  "cips",
+  "ebank",
+  "sct",
+  "visa",
+]);
+export type KhaltiCheckoutChannel = z.infer<typeof KhaltiCheckoutChannelSchema>;
+
 export interface KhaltiAmountBreakdown {
   label: string;
   amount: number;
@@ -29,6 +48,7 @@ export interface InitiateKhaltiOpts {
   amountPaisa: number;
   customerInfo?: { name?: string; email?: string; phone?: string };
   amountBreakdown?: KhaltiAmountBreakdown[];
+  modes?: KhaltiPaymentMode[];
   extra?: Record<`merchant_${string}`, string>;
 }
 
@@ -116,6 +136,7 @@ export async function initiateKhalti(opts: InitiateKhaltiOpts): Promise<Initiate
   };
   if (opts.customerInfo) body.customer_info = opts.customerInfo;
   if (opts.amountBreakdown) body.amount_breakdown = opts.amountBreakdown;
+  if (opts.modes && opts.modes.length > 0) body.modes = opts.modes;
   if (opts.extra) {
     for (const [k, v] of Object.entries(opts.extra)) {
       body[k] = v;
@@ -242,4 +263,40 @@ export async function verifyKhaltiPayment(opts: VerifyKhaltiPaymentOpts): Promis
     default:
       return { ...base, status: "pending" };
   }
+}
+
+/**
+ * Constructs a deep-link checkout URL for Khalti, targeting either the default multi-option
+ * selector or a specific direct channel (such as Mobile Banking `/mobank` or ConnectIPS `/cips`).
+ *
+ * @param paymentUrlOrPidx - Full `payment_url` returned by `initiateKhalti`, or raw `pidx` string.
+ * @param channel - Target channel (`"wallet"`, `"mobank"`, `"cips"`, `"ebank"`, `"sct"`, `"visa"`).
+ * @param opts - Options when passing a raw `pidx`, specifying the environment (`"sandbox"` or `"production"`).
+ */
+export function getKhaltiCheckoutUrl(
+  paymentUrlOrPidx: string,
+  channel?: KhaltiCheckoutChannel,
+  opts?: { env?: "sandbox" | "production" }
+): string {
+  if (!paymentUrlOrPidx || typeof paymentUrlOrPidx !== "string") {
+    throw new TypeError("paymentUrlOrPidx must be a non-empty string");
+  }
+
+  // If a full payment_url is provided
+  if (paymentUrlOrPidx.startsWith("http://") || paymentUrlOrPidx.startsWith("https://")) {
+    const parsed = new URL(paymentUrlOrPidx);
+    if (!channel) {
+      return parsed.toString();
+    }
+    parsed.pathname = `/${channel}`;
+    return parsed.toString();
+  }
+
+  // If a raw pidx is provided
+  const env = opts?.env ?? "production";
+  const origin = env === "sandbox" ? "https://test-pay.khalti.com" : "https://pay.khalti.com";
+  const path = channel ? `/${channel}` : "/";
+  const url = new URL(path, origin);
+  url.searchParams.set("pidx", paymentUrlOrPidx);
+  return url.toString();
 }

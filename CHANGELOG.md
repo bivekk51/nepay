@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-10-30
+
+### Added
+- **Khalti Multi-Channel Payment Modes**:
+  - Support for `modes: KhaltiPaymentMode[]` in `initiatePayment` and `initiateKhaltiPayment` (`"KHALTI"`, `"EBANKING"`, `"MOBILE_BANKING"`, `"CONNECT_IPS"`, `"SCT"`, `"VISA"`).
+  - Pre-filter channels on Khalti hosted checkout or restrict checkouts to specific banking rails.
+  - Exported `KhaltiPaymentMode` and `KhaltiPaymentModeSchema`.
+- **Khalti Direct Checkout URL Deep-linking**:
+  - Added `getKhaltiCheckoutUrl(paymentUrlOrPidx, channel?, opts?)` helper function.
+  - Generate direct deep links for Mobile Banking (`/mobank`), ConnectIPS (`/cips`), Internet Banking (`/ebank`), Khalti Wallet (`/wallet`), and Card channels.
+  - Supports deep linking to specific bank indices (`/mobank/:bankIdx`) and pre-filling customer mobile numbers (`?mobile=98XXXXXXXX`).
+  - Exported `KhaltiCheckoutChannel` and `KhaltiCheckoutChannelSchema`.
+
+### Fixed
+- **Documentation Table of Contents (TOC)**:
+  - Fixed issue where scrolling to the bottom or clicking the last heading (`Sandbox Testing Credentials`) would fail to highlight or would snap back to preceding sections.
+  - Intercepted Starlight custom element prototype setter to prevent narrow 53px slit intersection conflicts during smooth scrolling and reading trailing sections.
+  - Added bottom scroll breathing room (`padding-bottom: clamp(14rem, 45vh, 32rem)`) to `.sl-markdown-content` allowing end-of-page headings to scroll comfortably into reading view.
+
+### Documentation
+- Updated Khalti Gateway guide with comprehensive Multi-Channel Banking patterns and code examples.
+- Updated Quickstart guide with payment modes initiate syntax.
+- Added API reference and TypeScript type documentation for `getKhaltiCheckoutUrl`, `KhaltiPaymentMode`, and `KhaltiCheckoutChannel`.
+
 ## [0.1.0] - 2026-10-29
 
 ### Added

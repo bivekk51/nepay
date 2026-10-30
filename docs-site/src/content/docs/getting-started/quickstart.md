@@ -126,6 +126,8 @@ const checkout = await initiatePayment({
       email: "ram@example.com",
       phone: "9800000000",
     },
+    // Optional: Enable or restrict payment channels (Wallet, Mobile Banking, ConnectIPS)
+    modes: ["KHALTI", "MOBILE_BANKING", "CONNECT_IPS"],
   },
 });
 

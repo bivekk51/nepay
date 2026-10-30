@@ -9,6 +9,8 @@ import type {
   VerifyEsewaPaymentOpts,
   KhaltiConfig,
   KhaltiAmountBreakdown,
+  KhaltiPaymentMode,
+  KhaltiCheckoutChannel,
   InitiateKhaltiOpts,
   InitiateKhaltiResult,
   LookupKhaltiOpts,
@@ -66,6 +68,9 @@ describe("barrel type exports", () => {
     // Runtime: the barrel module loads and carries the value-level surface too.
     expect(barrel.EsewaConfigSchema).toBeDefined();
     expect(barrel.KhaltiConfigSchema).toBeDefined();
+    expect(barrel.KhaltiPaymentModeSchema).toBeDefined();
+    expect(barrel.KhaltiCheckoutChannelSchema).toBeDefined();
+    expect(typeof barrel.getKhaltiCheckoutUrl).toBe("function");
     expect(typeof barrel.initiatePayment).toBe("function");
     expect(typeof barrel.verifyPayment).toBe("function");
     // Touch the typed values so unused-variable checks stay quiet.

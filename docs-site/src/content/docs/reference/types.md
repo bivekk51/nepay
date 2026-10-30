@@ -49,6 +49,16 @@ interface KhaltiConfig {
 }
 ```
 
+### `KhaltiPaymentMode`
+```ts
+type KhaltiPaymentMode = "KHALTI" | "EBANKING" | "MOBILE_BANKING" | "CONNECT_IPS" | "SCT";
+```
+
+### `KhaltiCheckoutChannel`
+```ts
+type KhaltiCheckoutChannel = "wallet" | "mobank" | "cips" | "ebank" | "sct" | "visa";
+```
+
 ### `InitiateKhaltiResult`
 ```ts
 interface InitiateKhaltiResult {
