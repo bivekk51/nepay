@@ -7,8 +7,11 @@ import {
 } from "./esewa.js";
 import {
   KhaltiConfigSchema,
+  KhaltiPaymentModeSchema,
+  KhaltiCheckoutChannelSchema,
   initiateKhalti,
   verifyKhaltiPayment,
+  getKhaltiCheckoutUrl,
 } from "./khalti.js";
 
 export type { PaymentStatus, PaymentResult } from "./types.js";
@@ -23,6 +26,8 @@ export type {
 export type {
   KhaltiConfig,
   KhaltiAmountBreakdown,
+  KhaltiPaymentMode,
+  KhaltiCheckoutChannel,
   InitiateKhaltiOpts,
   InitiateKhaltiResult,
   LookupKhaltiOpts,
@@ -42,10 +47,13 @@ export {
 } from "./esewa.js";
 export {
   KhaltiConfigSchema,
+  KhaltiPaymentModeSchema,
+  KhaltiCheckoutChannelSchema,
   KHALTI_BASES,
   initiateKhalti,
   lookupKhalti,
   verifyKhaltiPayment,
+  getKhaltiCheckoutUrl,
 } from "./khalti.js";
 
 export const EsewaInitiateSchema = z.object({
@@ -77,6 +85,7 @@ export const KhaltiInitiateSchema = z.object({
         })
         .optional(),
       amountBreakdown: z.array(z.object({ label: z.string(), amount: z.number().int() })).optional(),
+      modes: z.array(KhaltiPaymentModeSchema).optional(),
       extra: z.record(z.string()).optional(),
     })
     .refine((data) => Boolean(data.orderId || data.purchaseOrderId), {
@@ -138,6 +147,7 @@ export async function initiatePayment(input: UnifiedInitiateInput): Promise<
         amountPaisa: parsed.order.amountPaisa,
         customerInfo: parsed.order.customerInfo,
         amountBreakdown: parsed.order.amountBreakdown,
+        modes: parsed.order.modes,
         extra: parsed.order.extra as Record<`merchant_${string}`, string> | undefined,
       });
     }
