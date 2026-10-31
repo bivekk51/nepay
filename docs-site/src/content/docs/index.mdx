@@ -9,20 +9,30 @@ head:
     content: |
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "Nepay",
-        "headline": "Unified Nepal Payment Gateway SDK",
-        "description": "Developer-first, typesafe TypeScript SDK for Nepal digital payment gateways: eSewa ePay v2 and Khalti ePayment v2.",
-        "applicationCategory": "DeveloperApplication",
-        "operatingSystem": "Node.js, Bun, Deno",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "NPR"
-        },
-        "url": "https://nepay.nepalbivek.com.np/",
-        "softwareVersion": "0.1.1",
-        "license": "https://opensource.org/licenses/MIT"
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "Nepay",
+            "alternateName": ["@bivekkk/nepay", "nepay SDK", "Nepal Payment Gateway SDK"],
+            "url": "https://nepay.nepalbivek.com.np/"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "Nepay",
+            "headline": "Unified Nepal Payment Gateway SDK",
+            "description": "Developer-first, typesafe TypeScript SDK for Nepal digital payment gateways: eSewa ePay v2 and Khalti ePayment v2.",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Node.js, Bun, Deno",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "NPR"
+            },
+            "url": "https://nepay.nepalbivek.com.np/",
+            "softwareVersion": "0.1.2",
+            "license": "https://opensource.org/licenses/MIT"
+          }
+        ]
       }
 ---
 

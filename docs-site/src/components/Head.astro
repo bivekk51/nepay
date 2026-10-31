@@ -1,7 +1,92 @@
 ---
 import Default from '@astrojs/starlight/components/Head.astro';
 import Analytics from '@vercel/analytics/astro';
+
+const { entry } = Astro.locals.starlightRoute;
+const pathname = Astro.url.pathname;
+const isHome = pathname === '/' || pathname === '';
+const is404 = entry?.id === '404' || pathname.startsWith('/404');
+
+// Section mappings for BreadcrumbList
+const sectionNames: Record<string, string> = {
+  'getting-started': 'Start Here',
+  'concepts': 'Core Concepts',
+  'gateways': 'Supported Gateways',
+  'recipes': 'Framework Recipes',
+  'guides': 'Guides & Sandbox',
+  'reference': 'API Reference',
+};
+
+const pathSegments = pathname.split('/').filter(Boolean);
+let breadcrumbJsonLd: string | null = null;
+let techArticleJsonLd: string | null = null;
+
+if (!isHome && !is404 && pathSegments.length > 0 && entry?.data) {
+  const items = [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: 'https://nepay.nepalbivek.com.np/',
+    },
+  ];
+
+  if (pathSegments.length > 1) {
+    const sectionKey = pathSegments[0];
+    const sectionLabel = sectionNames[sectionKey] || sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1);
+    items.push({
+      '@type': 'ListItem',
+      position: 2,
+      name: sectionLabel,
+      item: `https://nepay.nepalbivek.com.np/${sectionKey}/`,
+    });
+    items.push({
+      '@type': 'ListItem',
+      position: 3,
+      name: entry.data.title,
+      item: `https://nepay.nepalbivek.com.np${pathname.endsWith('/') ? pathname : pathname + '/'}`,
+    });
+  } else {
+    items.push({
+      '@type': 'ListItem',
+      position: 2,
+      name: entry.data.title,
+      item: `https://nepay.nepalbivek.com.np${pathname.endsWith('/') ? pathname : pathname + '/'}`,
+    });
+  }
+
+  breadcrumbJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items,
+  });
+
+  techArticleJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: entry.data.title,
+    description: entry.data.description || 'Developer documentation for nepay SDK.',
+    url: `https://nepay.nepalbivek.com.np${pathname.endsWith('/') ? pathname : pathname + '/'}`,
+    inLanguage: 'en',
+    author: {
+      '@type': 'Person',
+      name: 'Bivek Nepal',
+      url: 'https://github.com/bivekk51',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Nepay',
+      url: 'https://nepay.nepalbivek.com.np',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://nepay.nepalbivek.com.np/og-image.png',
+      },
+    },
+  });
+}
 ---
 
 <Default><slot /></Default>
+{breadcrumbJsonLd && <script type="application/ld+json" set:html={breadcrumbJsonLd} />}
+{techArticleJsonLd && <script type="application/ld+json" set:html={techArticleJsonLd} />}
 <Analytics />

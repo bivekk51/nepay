@@ -2,8 +2,8 @@
 
 > Unified, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
 
-Package: `nepay`
-Version: `0.1.0`
+Package: `@bivekkk/nepay`
+Version: `0.1.2`
 License: MIT
 Repository: https://github.com/bivekk51/nepay
 
@@ -13,11 +13,11 @@ Repository: https://github.com/bivekk51/nepay
 
 ### Installation
 ```bash
-npm install nepay
+npm install @bivekkk/nepay
 # or
-pnpm add nepay
+pnpm add @bivekkk/nepay
 # or
-bun add nepay
+bun add @bivekkk/nepay
 ```
 
 ### Core Philosophy: The Paisa Rule
@@ -29,7 +29,7 @@ Never use floating point numbers (`100.00`) to avoid floating point math drift i
 
 Built-in conversion utilities:
 ```ts
-import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "nepay";
+import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "@bivekkk/nepay";
 
 nprToPaisa(123.45); // => 12345
 paisaToRupeesString(12345); // => "123.45"
@@ -38,7 +38,7 @@ parseAmountToPaisa("1,000.0"); // => 100000 (safely handles eSewa commas!)
 
 ### 1. Unified Initiate Payment
 ```ts
-import { initiatePayment } from "nepay";
+import { initiatePayment } from "@bivekkk/nepay";
 
 // eSewa Initiate
 const esewaCheckout = await initiatePayment({
@@ -94,7 +94,7 @@ const khaltiCheckout = await initiatePayment({
 Never trust browser redirect parameters! An attacker can spoof `status=Completed` in query strings. `verifyPayment()` always contacts the official gateway server directly before granting `status: "completed"`.
 
 ```ts
-import { verifyPayment } from "nepay";
+import { verifyPayment } from "@bivekkk/nepay";
 
 // eSewa S2S Verification
 const verifiedEsewa = await verifyPayment({
@@ -172,7 +172,7 @@ if (verifiedKhalti.status === "completed") {
 ## 3. Express.js Production Recipe
 ```ts
 import express from "express";
-import { initiatePayment, verifyPayment } from "nepay";
+import { initiatePayment, verifyPayment } from "@bivekkk/nepay";
 
 const app = express();
 app.use(express.json());
@@ -262,7 +262,7 @@ app.get("/api/payment/callback/khalti", async (req, res) => {
 ```ts
 "use server";
 
-import { initiatePayment } from "nepay";
+import { initiatePayment } from "@bivekkk/nepay";
 import { redirect } from "next/navigation";
 
 export async function checkoutAction(formData: FormData) {
@@ -289,7 +289,7 @@ export async function checkoutAction(formData: FormData) {
 ### Route Handler: eSewa Callback (`app/api/payment/callback/esewa/route.ts`)
 ```ts
 import { NextRequest, NextResponse } from "next/server";
-import { verifyPayment } from "nepay";
+import { verifyPayment } from "@bivekkk/nepay";
 
 export async function GET(req: NextRequest) {
   const data = req.nextUrl.searchParams.get("data");

@@ -1,6 +1,6 @@
 ---
 title: Security & Server-Only Keys
-description: Security principles and best practices for integrating payments without leaking credentials.
+description: "Security principles for Nepal payment gateways: server-only credentials, timing-safe HMAC validation, and zero client-side secret leaks."
 ---
 
 Payment gateway integration errors frequently result in high-severity security vulnerabilities. `nepay` is built with a defense-in-depth architecture to eliminate common failure modes.

@@ -1,6 +1,6 @@
 ---
 title: S2S Verification & Contracts
-description: Why server-to-server verification is mandatory and how to handle provider verification differences.
+description: Why server-to-server (S2S) verification is mandatory for Nepal payment gateways to prevent spoofed callbacks and duplicate fulfillment.
 ---
 
 A dangerous mistake in Nepal payment integrations is fulfilling an order immediately upon receiving the user's browser redirect.

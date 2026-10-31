@@ -1,6 +1,6 @@
 ---
 title: "API Reference: Types & Schemas"
-description: TypeScript interfaces, types, and Zod schemas exported by nepay.
+description: Complete TypeScript interfaces, discriminated unions, and runtime Zod validation schemas exported by nepay.
 ---
 
 ## Types
