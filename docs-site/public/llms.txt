@@ -1,6 +1,6 @@
 # nepay
 
-> Developer-first, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
+> Developer-first, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2, Khalti ePayment v2, and Fonepay). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
 
 - **Package**: `@bivekkk/nepay`
 - **License**: MIT
@@ -10,9 +10,9 @@
 
 ## Core Rules & Principles
 1. **Integer Paisa Only**: All monetary values are strictly integer paisa (e.g. NPR 100.00 = 10000 paisa). Never pass floating-point numbers.
-2. **Server-Only Security**: Secret keys (`ESEWA_SECRET_KEY`, `KHALTI_SECRET_KEY`) must never be bundled into client-side browser code.
+2. **Server-Only Security**: Secret keys (`ESEWA_SECRET_KEY`, `KHALTI_SECRET_KEY`, `FONEPAY_SECRET_KEY`) must never be bundled into client-side browser code.
 3. **Mandatory S2S Verification**: Browser return redirects can be forged or dropped. `verifyPayment()` always queries the official gateway status endpoint before resolving `status: "completed"`.
-4. **Discriminated Union API**: Pass `method: "esewa"` or `method: "khalti"` to `initiatePayment()` and `verifyPayment()`. TypeScript auto-narrows arguments and responses.
+4. **Discriminated Union API**: Pass `method: "esewa"`, `method: "khalti"`, or `method: "fonepay"` to `initiatePayment()` and `verifyPayment()`. TypeScript auto-narrows arguments and responses.
 
 ## Installation
 ```bash
@@ -76,7 +76,7 @@ if (verified.status === "completed") {
 ### Supported Gateways
 - [/gateways/esewa](/gateways/esewa): eSewa ePay v2 complete guide, Form POST generation, HMAC-SHA256 signatures, GET vs POST callback handling, and status API.
 - [/gateways/khalti](/gateways/khalti): Khalti KPG-2 complete guide, `/epayment/initiate/`, pidx lookup verification, and HTTP 400 Expired response decoding.
-- [/gateways/fonepay](/gateways/fonepay): FonePay QR and Dynamic QR roadmap (Phase 2).
+- [/gateways/fonepay](/gateways/fonepay): Fonepay hosted web checkout, dynamic EMVCo QR code generation, zero-config mock simulator, and S2S verification.
 
 ### Framework Recipes
 - [/recipes/express](/recipes/express): Production-ready Express.js server handling checkout endpoints and GET/POST payment callbacks.

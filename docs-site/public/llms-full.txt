@@ -1,9 +1,9 @@
 # Unified Nepal Payments - Complete Documentation
 
-> Unified, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
+> Unified, typesafe, server-side TypeScript SDK for Nepal payment gateways (eSewa ePay v2, Khalti ePayment v2, and Fonepay). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
 
 Package: `@bivekkk/nepay`
-Version: `0.1.2`
+Version: `0.2.0`
 License: MIT
 Repository: https://github.com/bivekk51/nepay
 
@@ -326,18 +326,20 @@ export async function POST(req: NextRequest) {
 
 ### `initiatePayment(input)`
 - Inputs:
-  - `method: "esewa" | "khalti"`
-  - `config`: Gateway credentials (`EsewaConfig` or `KhaltiConfig`)
-  - `order`: Order metadata (`orderId`, `amountPaisa`, `purchaseOrderName`, `customerInfo`)
+  - `method: "esewa" | "khalti" | "fonepay"`
+  - `config`: Gateway credentials (`EsewaConfig`, `KhaltiConfig`, or `FonepayConfig`)
+  - `order`: Order metadata (`orderId`, `amountPaisa`, `purchaseOrderName`, `customerInfo`, etc.)
 - Returns:
-  - For eSewa: `{ url: string, fields: Record<string, string> }` (for auto-submitting POST form)
-  - For Khalti: `{ pidx: string, payment_url: string, expires_at: string, expires_in: number }`
+  - For eSewa: `{ method: "esewa", url: string, fields: Record<string, string> }` (for auto-submitting POST form)
+  - For Khalti: `{ method: "khalti", pidx: string, payment_url: string, expires_at: string, expires_in: number }`
+  - For Fonepay (hosted): `{ method: "fonepay", flow: "hosted", payment_url: string }`
+  - For Fonepay (QR): `{ method: "fonepay", flow: "qr", qr_message: string }`
 
 ### `verifyPayment(input)`
 - Inputs:
-  - `method: "esewa" | "khalti"`
+  - `method: "esewa" | "khalti" | "fonepay"`
   - `config`: Gateway credentials
-  - `callbackData`: `{ data: string }` for eSewa, `{ pidx: string }` for Khalti
+  - `callbackData`: `{ data: string }` for eSewa, `{ pidx: string }` for Khalti, or `{ PRN: string, ... }` for Fonepay
   - `expectedOrderId`: string
   - `expectedAmountPaisa`: number (integer paisa)
 - Returns: `PaymentResult`
@@ -356,6 +358,10 @@ export async function POST(req: NextRequest) {
 - `lookupKhalti(pidx, config)`: Directly calls Khalti `/epayment/lookup/`.
 - `verifyEsewaPayment(opts)`: Standalone eSewa callback & S2S verifier.
 - `verifyKhaltiPayment(opts)`: Standalone Khalti pidx lookup & verifier.
+- `initiateFonepay(input)`: Direct Fonepay hosted checkout URL or dynamic QR generator.
+- `verifyFonepayPayment(opts)`: Direct Fonepay S2S verifier.
+- `generateFonepayHostedSignature(...)`, `generateFonepayQrSignature(...)`: Deterministic HMAC-SHA512 generators.
+- `verifyFonepaySignature(...)`: Constant-time HMAC-SHA512 signature validation.
 - `nprToPaisa(npr)`: Safe float to integer paisa conversion.
 - `paisaToRupeesString(paisa)`: Paisa to formatted rupees string.
 - `parseAmountToPaisa(raw)`: Comma-resilient amount parser.

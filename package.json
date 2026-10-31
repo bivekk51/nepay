@@ -1,6 +1,6 @@
 {
   "name": "@bivekkk/nepay",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Developer-first unified Nepal payments SDK (eSewa, Khalti, Fonepay)",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -48,6 +48,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "prepublishOnly": "npm run build",
     "test": "vitest run --exclude '**/*live*'",
     "test:all": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run",
     "test:live": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run tests/live.test.ts",
