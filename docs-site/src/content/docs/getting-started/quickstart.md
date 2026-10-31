@@ -1,13 +1,14 @@
 ---
-title: Quick Start — eSewa & Khalti in 5 Minutes
-description: Step-by-step quickstart to integrate eSewa ePay v2 and Khalti ePayment v2 in Node.js and TypeScript using @bivekkk/nepay.
+title: Quick Start — eSewa, Khalti & Fonepay in 5 Minutes
+description: Step-by-step quickstart to integrate eSewa ePay v2, Khalti ePayment v2, and Fonepay (Dynamic QR & Hosted Web) in Node.js and TypeScript using @bivekkk/nepay.
 ---
 
-Accepting online payments across Nepal requires handling two fundamentally different gateway architectures:
+Accepting online payments across Nepal requires handling three distinct gateway architectures:
 - **eSewa (ePay v2)**: Requires an HTML Form POST containing an HMAC-SHA256 digital signature, redirecting the customer's browser, and resolving a base64-encoded callback.
 - **Khalti (ePayment v2 / KPG-2)**: Requires a server-side JSON REST request to `/epayment/initiate/`, redirecting the customer to a hosted `payment_url`, and querying `/epayment/lookup/` with a payment index (`pidx`).
+- **Fonepay (Dynamic QR & Hosted Web)**: Requires HMAC-SHA512 cryptographic digests. Supports two modes: Direct Dynamic EMVCo QR download for custom in-app checkout modals, or hosted web redirect checkout with server-to-server status verification.
 
-`nepay` unifies both behind a single, typesafe, server-side interface while enforcing strict integer paisa math and mandatory server-to-server verification.
+`nepay` unifies all three behind a single, typesafe, server-side interface while enforcing strict integer paisa math and mandatory server-to-server verification.
 
 ---
 
@@ -25,12 +26,19 @@ ESEWA_ENV="sandbox"
 # Create a free test account to get your keys: https://test-admin.khalti.com/#/join/merchant
 KHALTI_SECRET_KEY="your-khalti-sandbox-secret-key"
 KHALTI_ENV="sandbox"
+
+# Fonepay Sandbox / Local Mock
+# Use merchantCode "FONEPAYTEST" for instant mock sandbox testing without bank onboarding
+FONEPAY_MERCHANT_CODE="FONEPAYTEST"
+FONEPAY_SECRET_KEY="fonepay_secret_key"
+FONEPAY_RETURN_URL="https://yourdomain.com/api/payment/callback/fonepay"
+FONEPAY_IS_SANDBOX="true"
 ```
 
 Initialize provider configurations in a server module:
 
 ```ts title="src/lib/payment.ts"
-import type { EsewaConfig, KhaltiConfig } from "@bivekkk/nepay";
+import type { EsewaConfig, KhaltiConfig, FonepayConfig } from "@bivekkk/nepay";
 
 export const esewaConfig: EsewaConfig = {
   productCode: process.env.ESEWA_PRODUCT_CODE ?? "EPAYTEST",
@@ -46,6 +54,13 @@ export const khaltiConfig: KhaltiConfig = {
   returnUrl: "https://yourdomain.com/api/payment/callback/khalti",
   env: "sandbox", // "sandbox" | "production"
 };
+
+export const fonepayConfig: FonepayConfig = {
+  merchantCode: process.env.FONEPAY_MERCHANT_CODE ?? "FONEPAYTEST",
+  secretKey: process.env.FONEPAY_SECRET_KEY ?? "fonepay_secret_key",
+  returnUrl: process.env.FONEPAY_RETURN_URL ?? "https://yourdomain.com/api/payment/callback/fonepay",
+  isSandbox: process.env.FONEPAY_IS_SANDBOX === "true",
+};
 ```
 
 ### Configuration Parameters
@@ -53,9 +68,10 @@ export const khaltiConfig: KhaltiConfig = {
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `productCode` | <span class="param-type">string</span> | <span class="param-required">Required (eSewa)</span> | Merchant code issued by eSewa (`"EPAYTEST"` for sandbox). |
-| `secretKey` | <span class="param-type">string</span> | <span class="param-required">Required</span> | Cryptographic key used to sign eSewa digests or authenticate Khalti requests. |
+| `merchantCode` | <span class="param-type">string</span> | <span class="param-required">Required (Fonepay)</span> | Merchant code issued by Fonepay (`"FONEPAYTEST"` for mock sandbox). |
+| `secretKey` | <span class="param-type">string</span> | <span class="param-required">Required</span> | Cryptographic key used to sign digests or authenticate API requests. |
 | `successUrl` / `returnUrl` | <span class="param-type">string</span> | <span class="param-required">Required</span> | The URL on your server where the gateway redirects the customer after checkout. |
-| `env` | <span class="param-type">"sandbox" \| "production"</span> | <span class="param-required">Required</span> | Toggles between gateway test endpoints and live production servers. |
+| `env` / `isSandbox` | <span class="param-type">string \| boolean</span> | <span class="param-required">Required</span> | Toggles between gateway test endpoints and live production servers. |
 
 :::note[The Paisa Rule]
 All amounts in the SDK are integers representing **paisa** (`1 NPR = 100 Paisa`).
@@ -66,7 +82,7 @@ All amounts in the SDK are integers representing **paisa** (`1 NPR = 100 Paisa`)
 
 ## 2. Initiating a Payment
 
-Call `initiatePayment()` with `method: "esewa"` or `method: "khalti"`. TypeScript automatically narrows the accepted options and return type.
+Call `initiatePayment()` with `method: "esewa"`, `method: "khalti"`, or `method: "fonepay"`. TypeScript automatically narrows the accepted options and return type.
 
 ### Example: eSewa Initiation
 
@@ -148,6 +164,68 @@ const checkout = await initiatePayment({
 
 ---
 
+### Example: Fonepay Initiation
+
+Fonepay supports two operational modes depending on your user experience requirements:
+
+#### Option A: Hosted Web Redirect (`flow: "hosted"`)
+Redirects the customer to Fonepay's hosted checkout screen where they can log in via Mobile Banking or scan Fonepay's hosted QR:
+
+```ts title="src/routes/checkout.ts"
+import { initiatePayment } from "@bivekkk/nepay";
+import { fonepayConfig } from "../lib/payment.js";
+
+const checkout = await initiatePayment({
+  method: "fonepay",
+  config: fonepayConfig,
+  flow: "hosted",
+  order: {
+    orderId: "INV-2024-001",
+    amountPaisa: 10000, // NPR 100.00
+    remarks1: "Order #001",
+    remarks2: "Widget Purchase",
+  },
+});
+
+// checkout returns:
+// {
+//   flow: "hosted",
+//   payment_url: "https://dev-clientapi.fonepay.com/api/merchantRequest?PID=...&MD=P&PRN=...&DV=...",
+//   prn: "INV-2024-001"
+// }
+// Redirect customer to checkout.payment_url
+```
+
+#### Option B: Direct Dynamic QR (`flow: "qr"`)
+Generates an EMVCo dynamic QR string directly for embedding inside your custom checkout UI modal (e.g. PayBridge-style or native mobile app modal):
+
+```ts title="src/routes/checkout-qr.ts"
+import { initiatePayment } from "@bivekkk/nepay";
+import { fonepayConfig } from "../lib/payment.js";
+
+const checkout = await initiatePayment({
+  method: "fonepay",
+  config: fonepayConfig,
+  flow: "qr",
+  order: {
+    orderId: "INV-2024-001",
+    amountPaisa: 10000, // NPR 100.00
+    remarks1: "Order #001",
+    remarks2: "Widget Purchase",
+  },
+});
+
+// checkout returns:
+// {
+//   flow: "qr",
+//   qr_message: "000201010212...0406100.00...",
+//   prn: "INV-2024-001"
+// }
+// Render checkout.qr_message as a QR code SVG/canvas in your frontend!
+```
+
+---
+
 ## 3. Mandatory Server-to-Server Verification
 
 When the customer completes the transaction, they are redirected back to your callback route.
@@ -226,6 +304,59 @@ export async function handleKhaltiCallback(req, res) {
 
   return res.redirect(`/payment-failed?reason=${encodeURIComponent(result.status)}`);
 }
+
+---
+
+### Verifying Fonepay (Hosted Callback or Dynamic QR)
+
+Fonepay supports verification for both the hosted web callback and periodic dynamic QR polling:
+
+```ts title="src/routes/callback.ts"
+import { verifyPayment } from "@bivekkk/nepay";
+import { fonepayConfig } from "../lib/payment.js";
+
+// Option A: Hosted Web Callback
+export async function handleFonepayHostedCallback(req, res) {
+  // Fonepay redirects to your returnUrl with PRN, BID, UID, and DV query params
+  const { PRN, BID, UID, DV } = req.query;
+
+  const result = await verifyPayment({
+    method: "fonepay",
+    flow: "hosted",
+    config: fonepayConfig,
+    orderId: PRN as string,
+    expectedAmountPaisa: 10000,
+    callbackData: {
+      prn: PRN as string,
+      bid: BID as string,
+      uid: UID as string,
+      dv: DV as string,
+    },
+  });
+
+  if (result.status === "completed") {
+    await db.orders.update({
+      where: { id: result.orderId },
+      data: { status: "PAID", gatewayRef: result.traceId },
+    });
+    return res.redirect(`/order-confirmation?id=${result.orderId}`);
+  }
+
+  return res.redirect(`/payment-failed?reason=${encodeURIComponent(result.status)}`);
+}
+
+// Option B: Dynamic QR Polling
+export async function checkFonepayQrStatus(orderId: string) {
+  const result = await verifyPayment({
+    method: "fonepay",
+    flow: "qr",
+    config: fonepayConfig,
+    orderId,
+    expectedAmountPaisa: 10000,
+  });
+
+  return result; // status: "completed" | "pending" | "failed"
+}
 ```
 
 ---
@@ -249,5 +380,5 @@ interface PaymentResult {
 | `status` | <span class="param-type">PaymentStatus</span> | `"completed"` if payment is 100% verified server-to-server; `"pending"` if initiated but incomplete; `"expired"` if customer exceeded time; `"canceled"` if aborted; `"failed"` if tampered or amount mismatch. |
 | `orderId` | <span class="param-type">string</span> | The identifier of your order (`transaction_uuid` or `purchase_order_id`). |
 | `amountPaisa` | <span class="param-type">number</span> | Exact integer paisa verified by the gateway. |
-| `traceId` | <span class="param-type">string \| null</span> | Gateway settlement reference (`ref_id` in eSewa, `transaction_id` in Khalti). |
+| `traceId` | <span class="param-type">string \| null</span> | Gateway settlement reference (`ref_id` in eSewa, `transaction_id` in Khalti, `UID` / `bankTxnId` in Fonepay). |
 | `raw` | <span class="param-type">unknown</span> | The raw decoded response received from the gateway for debugging or logging. |

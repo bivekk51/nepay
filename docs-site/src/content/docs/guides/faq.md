@@ -57,6 +57,14 @@ head:
               "@type": "Answer",
               "text": "In the Khalti sandbox, only Khalti Wallet payments are enabled for automated testing. Card payments and e-banking options are only available in production after merchant KYC approval."
             }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I test Fonepay without official bank credentials?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Fonepay requires acquiring bank approval for merchant credentials. nepay provides a built-in mock sandbox mode: setting isSandbox: true with merchantCode: \"FONEPAYTEST\" instantly generates valid EMVCo dynamic QR codes and mock responses so you can build and test your UI locally without waiting for bank paperwork."
+            }
           }
         ]
       }
@@ -95,3 +103,15 @@ The SDK catches this and throws `EsewaRetryableError`. Do not fail the user's or
 
 ### Can I test cards or e-banking in Khalti sandbox?
 In the Khalti sandbox (`test-pay.khalti.com`), only Khalti Wallet payments are enabled for automated testing. Card payments and e-banking options are only available in production after merchant KYC approval.
+
+### How can I test Fonepay without official bank credentials?
+Fonepay does not offer an open developer self-signup portal; credentials must be provisioned via an acquiring commercial bank. `nepay` solves this with a built-in mock simulator mode:
+```ts
+const fonepayConfig: FonepayConfig = {
+  merchantCode: "FONEPAYTEST",
+  apiSecret: "fonepay_secret_key",
+  returnUrl: "http://localhost:3000/api/callback/fonepay",
+  isSandbox: true,
+};
+```
+Setting `isSandbox: true` and `merchantCode: "FONEPAYTEST"` allows you to test both `flow: "hosted"` and `flow: "qr"` locally, generating valid EMVCo dynamic QR codes for testing scanners and custom checkout modals immediately. When you receive real credentials from your bank, simply replace the environment variables—no code changes needed.

@@ -8,12 +8,12 @@ Payment gateway integration errors frequently result in high-severity security v
 ## ⚠️ The Server-Only Rule
 
 :::danger[Never Expose Secret Keys to the Browser]
-`EsewaConfig.secretKey` and `KhaltiConfig.secretKey` must **never** be shipped in client-side bundles (e.g. React, Vue, Svelte, or Next.js `NEXT_PUBLIC_*` variables).
+`EsewaConfig.secretKey`, `KhaltiConfig.secretKey`, and `FonepayConfig.secretKey` must **never** be shipped in client-side bundles (e.g. React, Vue, Svelte, or Next.js `NEXT_PUBLIC_*` variables).
 :::
 
 If a secret key is exposed in browser JavaScript:
-- Attackers can sign arbitrary fraudulent eSewa payment callbacks and mark orders paid.
-- Attackers can issue unauthorized API queries and refunds directly to your Khalti merchant balance.
+- Attackers can sign arbitrary fraudulent eSewa or Fonepay payment callbacks and mark orders paid.
+- Attackers can issue unauthorized API queries, QR downloads, and refunds directly to your merchant balance.
 
 All calls to `initiatePayment()` and `verifyPayment()` must execute strictly in backend code:
 - Node.js / Express / Fastify / Koa / NestJS route handlers
@@ -29,7 +29,7 @@ The SDK adheres to a strict zero-leak logging discipline:
 
 ## Constant-Time HMAC Signature Comparison
 
-When verifying eSewa callback signatures, standard string comparison (`a === b`) is vulnerable to **timing attacks**, where an attacker measures slight microsecond timing differences to infer byte values.
+When verifying eSewa (HMAC-SHA256) and Fonepay (HMAC-SHA512) callback signatures, standard string comparison (`a === b`) is vulnerable to **timing attacks**, where an attacker measures slight microsecond timing differences to infer byte values.
 
 `nepay` uses `crypto.timingSafeEqual`:
 
@@ -44,7 +44,7 @@ function constantTimeEq(a: string, b: string): boolean {
 }
 ```
 
-This ensures that the time taken to evaluate the signature remains constant regardless of how many bytes match.
+This ensures that the time taken to evaluate signatures remains constant regardless of how many bytes match. Built-in helpers `verifyFonepaySignature()` and eSewa verification use this pattern everywhere.
 
 ## Unique Transaction IDs Per Attempt
 
