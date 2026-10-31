@@ -26,6 +26,13 @@ const khaltiConfig = {
   env: "sandbox" as const,
 };
 
+const fonepayConfig = {
+  merchantCode: process.env.FONEPAY_MERCHANT_CODE ?? "FONEPAYTEST",
+  secretKey: process.env.FONEPAY_SECRET_KEY ?? "fonepay_secret_key",
+  returnUrl: "https://example.com/payments/fonepay/callback",
+  isSandbox: true,
+};
+
 /** Query values can be string | string[] | object — take the plain-string case. */
 function queryString(req: Request, name: string): string {
   const v = req.query[name];
@@ -117,5 +124,79 @@ export async function khaltiReturn(req: Request, res: Response): Promise<void> {
   } catch (err) {
     // Khalti verify throws only on transport/unparseable errors.
     res.status(502).json({ status: "failed", error: (err as Error).message });
+  }
+}
+
+export async function startFonepayHosted(req: Request, res: Response): Promise<void> {
+  const initiated = await initiatePayment({
+    method: "fonepay",
+    flow: "hosted",
+    config: fonepayConfig,
+    order: {
+      orderId: stringField(bodyField(req, "orderId")),
+      amountPaisa: Number(bodyField(req, "amountPaisa")),
+      remarks1: stringField(bodyField(req, "orderName")),
+    },
+  });
+  if (!("payment_url" in initiated)) {
+    throw new Error("unexpected initiate result for fonepay hosted");
+  }
+  res.redirect(initiated.payment_url);
+}
+
+export async function startFonepayQr(req: Request, res: Response): Promise<void> {
+  const initiated = await initiatePayment({
+    method: "fonepay",
+    flow: "qr",
+    config: fonepayConfig,
+    order: {
+      orderId: stringField(bodyField(req, "orderId")),
+      amountPaisa: Number(bodyField(req, "amountPaisa")),
+      remarks1: stringField(bodyField(req, "orderName")),
+    },
+  });
+  if (!("qr_message" in initiated)) {
+    throw new Error("unexpected initiate result for fonepay qr");
+  }
+  res.json(initiated);
+}
+
+export async function fonepayCallback(req: Request, res: Response): Promise<void> {
+  const prn = queryString(req, "PRN");
+  const bid = queryString(req, "BID");
+  const uid = queryString(req, "UID");
+  const dv = queryString(req, "DV");
+
+  try {
+    const result = await verifyPayment({
+      method: "fonepay",
+      flow: "hosted",
+      config: fonepayConfig,
+      orderId: prn,
+      expectedAmountPaisa: Number(req.query.amountPaisa),
+      callbackData: { prn, bid, uid, dv },
+    });
+    if (result.status === "completed") {
+      // TODO: fulfil order
+    }
+    res.json({ status: result.status, traceId: result.traceId });
+  } catch (err) {
+    res.status(400).json({ status: "failed", error: (err as Error).message });
+  }
+}
+
+export async function fonepayQrStatus(req: Request, res: Response): Promise<void> {
+  const orderId = queryString(req, "orderId");
+  try {
+    const result = await verifyPayment({
+      method: "fonepay",
+      flow: "qr",
+      config: fonepayConfig,
+      orderId,
+      expectedAmountPaisa: Number(req.query.amountPaisa),
+    });
+    res.json({ status: result.status, traceId: result.traceId });
+  } catch (err) {
+    res.status(500).json({ status: "failed", error: (err as Error).message });
   }
 }

@@ -1,14 +1,15 @@
 ---
-title: Express.js eSewa & Khalti Integration
-description: Production-ready Express.js server example for eSewa ePay v2 and Khalti ePayment v2 with webhook and callback verification.
+title: Express.js Payment Gateway Integration (eSewa, Khalti & Fonepay)
+description: Production-ready Express.js server example for eSewa ePay v2, Khalti ePayment v2, and Fonepay (Dynamic QR & Hosted Web) with webhook and callback verification.
 ---
 
 This recipe demonstrates a complete, production-ready Express.js application implementing:
-1. Provider configuration with environment variables.
-2. Checkout initiation for eSewa (auto-submitting HTML form) and Khalti (302 redirect).
+1. Provider configuration with environment variables for all three gateways.
+2. Checkout initiation for eSewa (auto-submitting HTML form), Khalti (REST redirect), and Fonepay (both Hosted Web redirect and Dynamic QR download).
 3. Resilient eSewa callback handling supporting both **GET** and **POST** requests.
 4. Khalti return URL verification querying the server-to-server lookup endpoint.
-5. Post-verification database fulfillment patterns.
+5. Fonepay hosted return URL verification and Dynamic QR polling endpoint.
+6. Post-verification database fulfillment patterns.
 
 ---
 
@@ -21,6 +22,7 @@ import {
   verifyPayment,
   type EsewaConfig,
   type KhaltiConfig,
+  type FonepayConfig,
   EsewaRetryableError,
 } from "@bivekkk/nepay";
 
@@ -47,6 +49,14 @@ const khaltiConfig: KhaltiConfig = {
   env: "sandbox",
 };
 
+const fonepayConfig: FonepayConfig = {
+  // Use "FONEPAYTEST" for instant local mock mode without bank onboarding
+  merchantCode: process.env.FONEPAY_MERCHANT_CODE ?? "FONEPAYTEST",
+  secretKey: process.env.FONEPAY_SECRET_KEY ?? "fonepay_secret_key",
+  returnUrl: `${process.env.APP_URL ?? "http://localhost:3000"}/api/payment/callback/fonepay`,
+  isSandbox: process.env.NODE_ENV !== "production",
+};
+
 // --------------------------------------------------------------------------
 // eSewa Endpoints
 // --------------------------------------------------------------------------
@@ -64,6 +74,10 @@ app.post("/api/payment/esewa/initiate", async (req: Request, res: Response) => {
         amountPaisa: Number(amountPaisa),
       },
     });
+
+    if (!("url" in result && "fields" in result)) {
+      return res.status(500).json({ error: "Unexpected eSewa initiate result" });
+    }
 
     // Build hidden input tags for form POST
     const inputs = Object.entries(result.fields)
@@ -142,6 +156,10 @@ app.post("/api/payment/khalti/initiate", async (req: Request, res: Response) => 
       },
     });
 
+    if (!("payment_url" in result)) {
+      return res.status(500).json({ error: "Unexpected Khalti initiate result" });
+    }
+
     // Save result.pidx to your database mapped to orderId
     // Redirect customer directly to Khalti's hosted payment page
     return res.redirect(result.payment_url);
@@ -179,6 +197,142 @@ app.get("/api/payment/callback/khalti", async (req: Request, res: Response) => {
   }
 });
 
+// --------------------------------------------------------------------------
+// Fonepay Endpoints (Hosted Web & Dynamic QR)
+// --------------------------------------------------------------------------
+
+// POST /api/payment/fonepay/hosted/initiate: Redirects to Fonepay Hosted Web Checkout
+app.post("/api/payment/fonepay/hosted/initiate", async (req: Request, res: Response) => {
+  const { orderId, amountPaisa } = req.body;
+
+  try {
+    const result = await initiatePayment({
+      method: "fonepay",
+      flow: "hosted",
+      config: fonepayConfig,
+      order: {
+        orderId: String(orderId),
+        amountPaisa: Number(amountPaisa),
+        remarks1: `Order ${orderId}`,
+      },
+    });
+
+    if (!("payment_url" in result)) {
+      return res.status(500).json({ error: "Unexpected Fonepay initiate result" });
+    }
+
+    // Redirect customer browser directly to Fonepay's hosted portal
+    return res.redirect(result.payment_url);
+  } catch (err) {
+    return res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+// GET /api/payment/callback/fonepay: Handles customer return from Fonepay Hosted Checkout
+app.get("/api/payment/callback/fonepay", async (req: Request, res: Response) => {
+  const { PRN, BID, UID, DV } = req.query;
+
+  if (!PRN || !BID || !UID || !DV) {
+    return res.status(400).send("Missing Fonepay callback parameters");
+  }
+
+  try {
+    const result = await verifyPayment({
+      method: "fonepay",
+      flow: "hosted",
+      config: fonepayConfig,
+      orderId: String(PRN),
+      expectedAmountPaisa: 10000, // Look up expected order amount in DB
+      callbackData: {
+        prn: String(PRN),
+        bid: String(BID),
+        uid: String(UID),
+        dv: String(DV),
+      },
+    });
+
+    if (result.status === "completed") {
+      // ✅ S2S Verified via verificationMerchant API: Mark order as paid
+      console.log("Fonepay Hosted Payment Verified. UID:", result.traceId);
+      return res.redirect(`/order/success?id=${result.orderId}&ref=${result.traceId}`);
+    }
+
+    return res.redirect(`/order/failed?reason=${encodeURIComponent(result.status)}`);
+  } catch (err) {
+    return res.status(400).send(`Fonepay verification error: ${(err as Error).message}`);
+  }
+});
+
+// POST /api/payment/fonepay/qr/initiate: Generates Dynamic QR for In-Page Modal
+app.post("/api/payment/fonepay/qr/initiate", async (req: Request, res: Response) => {
+  const { orderId, amountPaisa } = req.body;
+
+  try {
+    const result = await initiatePayment({
+      method: "fonepay",
+      flow: "qr",
+      config: fonepayConfig,
+      order: {
+        orderId: String(orderId),
+        amountPaisa: Number(amountPaisa),
+        remarks1: `Order ${orderId}`,
+      },
+    });
+
+    if (!("qr_message" in result)) {
+      return res.status(500).json({ error: "Unexpected Fonepay QR result" });
+    }
+
+    // Returns { qr_message, prn, flow: "qr" } to frontend for rendering in a custom modal
+    return res.json(result);
+  } catch (err) {
+    return res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+// GET /api/payment/fonepay/qr/status/:orderId: Polls payment status of Dynamic QR
+app.get("/api/payment/fonepay/qr/status/:orderId", async (req: Request, res: Response) => {
+  const { orderId } = req.params;
+
+  try {
+    const result = await verifyPayment({
+      method: "fonepay",
+      flow: "qr",
+      config: fonepayConfig,
+      orderId,
+      expectedAmountPaisa: 10000,
+    });
+
+    if (result.status === "completed") {
+      // ✅ S2S Verified via thirdPartyDynamicQrGetStatus: Mark order paid in DB
+      console.log("Fonepay QR Payment Verified. Trace ID:", result.traceId);
+    }
+
+    return res.json({
+      status: result.status, // "completed" | "pending" | "failed"
+      traceId: result.traceId,
+      amountPaisa: result.amountPaisa,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+    if (result.status === "completed") {
+      // ✅ S2S Verified via thirdPartyDynamicQrGetStatus: Mark order paid in DB
+      console.log("Fonepay QR Payment Verified. Trace ID:", result.traceId);
+    }
+
+    return res.json({
+      status: result.status, // "completed" | "pending" | "failed"
+      traceId: result.traceId,
+      amountPaisa: result.amountPaisa,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Payment server running on http://localhost:3000");
 });
@@ -200,3 +354,7 @@ eSewa callbacks can arrive as either GET or POST. Using `app.all("/api/payment/c
 
 ### 4. Khalti S2S Verification
 Khalti redirects the user back with `?pidx=...`. Never trust query status parameters alone. `verifyPayment()` sends an authenticated POST to `/epayment/lookup/` to verify settlement.
+
+### 5. Fonepay Hosted Web vs Dynamic QR
+- **Hosted Flow**: Builds an HMAC-SHA512 signed query string and redirects directly to Fonepay's hosted portal. On return, validates the callback signature and performs a server-to-server check via `/api/merchantRequest/verificationMerchant`.
+- **Dynamic QR Flow**: Calls Fonepay or the built-in mock simulator to obtain an EMVCo dynamic QR string. The frontend renders this QR in a modal, and polls `/api/payment/fonepay/qr/status/:prn` until status changes to `completed`.
