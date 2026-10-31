@@ -1,6 +1,6 @@
 ---
 title: Installation & Requirements
-description: How to install and set up nepay in your TypeScript or JavaScript project.
+description: How to install and configure @bivekkk/nepay in your Node.js, Bun, or Deno project with TypeScript and ESM support.
 ---
 
 `nepay` is published to the npm registry as a zero-dependency (other than Zod) core library targeting Node 18+.

@@ -1,6 +1,6 @@
 ---
 title: Integer Paisa & Money Math
-description: Why nepay uses integer paisa and how to avoid floating-point errors.
+description: Why nepay enforces integer paisa arithmetic to avoid JavaScript floating-point errors and guarantee reliable transaction amounts.
 ---
 
 One of the most frequent sources of payment bugs and silent reconciliation failures in fintech applications is **floating-point arithmetic drift** (e.g. `0.1 + 0.2 === 0.30000000000000004`).

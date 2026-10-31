@@ -1,6 +1,6 @@
 ---
 title: "API Reference: Functions"
-description: Complete reference for all functions and methods exported by nepay.
+description: Complete reference for all unified payment functions and gateway helper methods exported by nepay.
 ---
 
 ## Unified Functions

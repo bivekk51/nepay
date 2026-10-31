@@ -1,6 +1,6 @@
 ---
 title: FonePay (Dynamic QR) Roadmap
-description: Overview of FonePay integration status, Dynamic QR architecture, and Phase 2 roadmap.
+description: Overview of FonePay integration support in nepay, covering Dynamic QR architecture, merchant validation flow, and the Phase 2 roadmap.
 ---
 
 FonePay is Nepal's dominant interoperable retail payment network operated by F1Soft International. Unlike eSewa and Khalti, FonePay is bank-integrated and requires an approved corporate merchant agreement with a licensed partner commercial bank.
