@@ -32,6 +32,15 @@ function khaltiConfig() {
   };
 }
 
+function fonepayConfig() {
+  return {
+    merchantCode: process.env.FONEPAY_MERCHANT_CODE ?? "FONEPAYTEST",
+    secretKey: process.env.FONEPAY_SECRET_KEY ?? "fonepay_secret_key",
+    returnUrl: "https://example.com/payments/fonepay/callback",
+    isSandbox: true,
+  };
+}
+
 export async function startEsewaPayment(orderId: string, amountPaisa: number) {
   const initiated = await initiatePayment({
     method: "esewa",
@@ -91,6 +100,69 @@ export async function handleKhaltiReturn(pidx: string, amountPaisa: number) {
     return { status: result.status };
   } catch (err) {
     // Khalti verify throws only on transport/unparseable errors.
+    return { status: "failed" as const, error: (err as Error).message };
+  }
+}
+
+export async function startFonepayHostedPayment(orderId: string, amountPaisa: number, remarks: string) {
+  const initiated = await initiatePayment({
+    method: "fonepay",
+    flow: "hosted",
+    config: fonepayConfig(),
+    order: { orderId, amountPaisa, remarks1: remarks },
+  });
+  if (!("payment_url" in initiated)) {
+    throw new Error("unexpected initiate result for fonepay hosted");
+  }
+  return { paymentUrl: initiated.payment_url };
+}
+
+export async function startFonepayQrPayment(orderId: string, amountPaisa: number, remarks: string) {
+  const initiated = await initiatePayment({
+    method: "fonepay",
+    flow: "qr",
+    config: fonepayConfig(),
+    order: { orderId, amountPaisa, remarks1: remarks },
+  });
+  if (!("qr_message" in initiated)) {
+    throw new Error("unexpected initiate result for fonepay qr");
+  }
+  return { qrMessage: initiated.qr_message, prn: initiated.prn };
+}
+
+export async function handleFonepayHostedCallback(
+  params: { prn: string; bid: string; uid: string; dv: string },
+  amountPaisa: number
+) {
+  try {
+    const result = await verifyPayment({
+      method: "fonepay",
+      flow: "hosted",
+      config: fonepayConfig(),
+      orderId: params.prn,
+      expectedAmountPaisa: amountPaisa,
+      callbackData: params,
+    });
+    if (result.status === "completed") {
+      // TODO: fulfil order
+    }
+    return { status: result.status, traceId: result.traceId };
+  } catch (err) {
+    return { status: "failed" as const, error: (err as Error).message };
+  }
+}
+
+export async function checkFonepayQrPaymentStatus(orderId: string, amountPaisa: number) {
+  try {
+    const result = await verifyPayment({
+      method: "fonepay",
+      flow: "qr",
+      config: fonepayConfig(),
+      orderId,
+      expectedAmountPaisa: amountPaisa,
+    });
+    return { status: result.status, traceId: result.traceId };
+  } catch (err) {
     return { status: "failed" as const, error: (err as Error).message };
   }
 }

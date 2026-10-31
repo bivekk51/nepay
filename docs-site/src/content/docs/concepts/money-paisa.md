@@ -22,10 +22,10 @@ Every amount passed to `initiatePayment()` or returned by `verifyPayment()` is r
 
 ## Built-in Conversion Helpers
 
-The SDK provides three dedicated helpers for converting between rupees and paisa:
+The SDK provides four dedicated helpers for converting between rupees and paisa:
 
 ```ts
-import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "@bivekkk/nepay";
+import { nprToPaisa, paisaToRupeesString, parseAmountToPaisa, fonepayPaisaToAmount } from "@bivekkk/nepay";
 ```
 
 ### 1. `nprToPaisa(npr: number): number`
@@ -45,7 +45,16 @@ paisaToRupeesString(10000); // => "100" (trailing zeros trimmed)
 paisaToRupeesString(10050); // => "100.5"
 ```
 
-### 3. `parseAmountToPaisa(raw: string | number): number`
+### 3. `fonepayPaisaToAmount(paisa: number): string`
+Converts integer paisa to a strict 2-decimal rupee string preserving trailing zeroes (`.00`) as required for Fonepay's HMAC-SHA512 checksums and EMVCo QR payloads.
+
+```ts
+fonepayPaisaToAmount(10000); // => "100.00"
+fonepayPaisaToAmount(12345); // => "123.45"
+fonepayPaisaToAmount(50);    // => "0.50"
+```
+
+### 4. `parseAmountToPaisa(raw: string | number): number`
 Strips commas and formatting quirks from callback responses and parses them back into safe integer paisa.
 
 ```ts
@@ -72,3 +81,8 @@ If you perform string equality `total_amount === "1000"`, the verification would
 Khalti operates natively in **integer paisa**:
 - Minimum amount is `1000` (NPR 10). Passing less throws a pre-flight validation error.
 - Breakdown sum (`amount_breakdown[].amount`) must equal `amount` in paisa.
+
+### Fonepay (Dynamic QR & Web)
+Fonepay requires amounts to be formatted with exactly **two decimal places** (e.g. `"100.00"`) when calculating cryptographic HMAC-SHA512 checksums and encoding EMVCo dynamic QR strings:
+- Passing `"100"` instead of `"100.00"` causes a hash mismatch and signature rejection at Fonepay's gateway.
+- `nepay` uses `fonepayPaisaToAmount()` internally to ensure all HMAC calculations and EMVCo tag `54` amounts strictly conform to this format.

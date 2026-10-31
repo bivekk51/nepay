@@ -82,6 +82,79 @@ interface LookupKhaltiResult {
 }
 ```
 
+### `FonepayConfig`
+```ts
+interface FonepayConfig {
+  merchantCode: string;
+  secretKey: string;
+  isSandbox?: boolean;
+  returnUrl?: string;
+  hostedBaseUrl?: string;
+  hostedVerifyBaseUrl?: string;
+  qrBaseUrl?: string;
+  qrStatusBaseUrl?: string;
+}
+```
+
+### `FonepayFlow`
+```ts
+type FonepayFlow = "hosted" | "qr";
+```
+
+### `InitiateFonepayHostedResult`
+```ts
+interface InitiateFonepayHostedResult {
+  flow: "hosted";
+  payment_url: string;
+  prn: string;
+}
+```
+
+### `InitiateFonepayQrResult`
+```ts
+interface InitiateFonepayQrResult {
+  flow: "qr";
+  qr_message: string;
+  prn: string;
+  websocket_url?: string;
+  expires_in?: number;
+}
+```
+
+### `InitiateFonepayOpts`
+```ts
+interface InitiateFonepayOpts {
+  config: FonepayConfig;
+  orderId: string;
+  amountPaisa: number;
+  flow?: FonepayFlow;
+  returnUrl?: string;
+  remarks1?: string;
+  remarks2?: string;
+  date?: Date | string;
+}
+```
+
+### `VerifyFonepayPaymentOpts`
+```ts
+interface VerifyFonepayPaymentOpts {
+  config: FonepayConfig;
+  orderId: string;
+  expectedAmountPaisa: number;
+  flow?: FonepayFlow;
+  callbackData?: {
+    prn?: string;
+    uid?: string;
+    bid?: string;
+    p_amt?: string | number;
+    amt?: string | number;
+    dv?: string;
+    bc?: string;
+    [key: string]: unknown;
+  };
+}
+```
+
 ---
 
 ## Errors
@@ -115,5 +188,23 @@ const ESEWA_BASES = {
 const KHALTI_BASES = {
   sandbox: "https://dev.khalti.com/api/v2",
   production: "https://khalti.com/api/v2",
+} as const;
+```
+
+### `FONEPAY_BASES`
+```ts
+const FONEPAY_BASES = {
+  sandbox: {
+    hosted: "https://dev-clientapi.fonepay.com/api/merchantRequest",
+    hostedVerify: "https://dev-clientapi.fonepay.com/api/merchantRequest/verificationMerchant",
+    qr: "https://dev-clientapi.fonepay.com/api/merchant/thirdPartyDynamicQrDownload",
+    qrStatus: "https://dev-clientapi.fonepay.com/api/merchant/thirdPartyDynamicQrGetStatus",
+  },
+  production: {
+    hosted: "https://clientapi.fonepay.com/api/merchantRequest",
+    hostedVerify: "https://clientapi.fonepay.com/api/merchantRequest/verificationMerchant",
+    qr: "https://clientapi.fonepay.com/api/merchant/thirdPartyDynamicQrDownload",
+    qrStatus: "https://clientapi.fonepay.com/api/merchant/thirdPartyDynamicQrGetStatus",
+  },
 } as const;
 ```

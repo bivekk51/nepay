@@ -1,6 +1,6 @@
 ---
-title: "Nepal Payment Gateway SDK (eSewa & Khalti)"
-description: "Developer-first, typesafe TypeScript SDK for Nepal payment gateways (eSewa ePay v2 and Khalti ePayment v2). Zero browser leaks and integer paisa math."
+title: "Nepal Payment Gateway SDK (eSewa, Khalti & Fonepay)"
+description: "Developer-first, typesafe TypeScript SDK for Nepal payment gateways (eSewa ePay v2, Khalti ePayment v2, and Fonepay Dynamic QR & Hosted Web). Zero browser leaks and integer paisa math."
 editUrl: false
 head:
   - tag: script
@@ -20,7 +20,7 @@ head:
             "@type": "SoftwareApplication",
             "name": "Nepay",
             "headline": "Unified Nepal Payment Gateway SDK",
-            "description": "Developer-first, typesafe TypeScript SDK for Nepal digital payment gateways: eSewa ePay v2 and Khalti ePayment v2.",
+            "description": "Developer-first, typesafe TypeScript SDK for Nepal digital payment gateways: eSewa ePay v2, Khalti ePayment v2, and Fonepay Dynamic QR & Hosted Web.",
             "applicationCategory": "DeveloperApplication",
             "operatingSystem": "Node.js, Bun, Deno",
             "offers": {
@@ -40,7 +40,7 @@ import HeroDiagram from '../../components/HeroDiagram.astro';
 
 <HeroDiagram />
 
-A developer-first, typesafe, server-side TypeScript SDK for integrating Nepal's leading digital payment gateways: **eSewa (ePay v2)** and **Khalti (ePayment v2)**. Built for modern backend runtimes with strict integer paisa arithmetic, mandatory server-to-server (S2S) verification, and zero client-side credential leaks.
+A developer-first, typesafe, server-side TypeScript SDK for integrating Nepal's leading digital payment gateways: **eSewa (ePay v2)**, **Khalti (ePayment v2)**, and **Fonepay (Dynamic QR & Hosted Web)**. Built for modern backend runtimes with strict integer paisa arithmetic, mandatory server-to-server (S2S) verification, and zero client-side credential leaks.
 
 ## Quick Installation
 
@@ -137,7 +137,7 @@ Browser redirects can be intercepted, spoofed, or replayed by malicious users. T
 |---|---|---|---|---|
 | **eSewa** | ePay v2 | HTML Form POST + HMAC-SHA256 | S2S Status API + Base64 Callback | Sandbox (UAT) & Production |
 | **Khalti** | ePayment v2 (KPG-2) | REST JSON (`/epayment/initiate/`) | S2S Lookup API (`/epayment/lookup/`) | Sandbox & Production |
-| **FonePay** | Dynamic QR / Web | Direct Merchant API | Webhook + S2S Query | Phase 2 Roadmap |
+| **Fonepay** | Dynamic QR & Hosted Web | HMAC-SHA512 GET / POST (`/api/merchantRequest`) | S2S Status Query (`verificationMerchant` / QR Status) | Mock Sandbox (`FONEPAYTEST`) & Production |
 
 ---
 
@@ -158,7 +158,15 @@ Browser redirects can be intercepted, spoofed, or replayed by malicious users. T
       <span>5-Minute Quickstart</span>
       <span class="arrow">&rarr;</span>
     </div>
-    <p class="guide-card-desc">Step-by-step tutorial covering both eSewa and Khalti end-to-end lifecycles.</p>
+    <p class="guide-card-desc">Step-by-step tutorial covering eSewa, Khalti, and Fonepay end-to-end lifecycles.</p>
+  </a>
+
+  <a href="/gateways/fonepay/" class="guide-card">
+    <div class="guide-card-title">
+      <span>Fonepay (QR & Web) Guide</span>
+      <span class="arrow">&rarr;</span>
+    </div>
+    <p class="guide-card-desc">Dual Hosted Web and Direct Dynamic EMVCo QR flows, HMAC-SHA512 security, and developer mock testing.</p>
   </a>
 
   <a href="/gateways/esewa/" class="guide-card">

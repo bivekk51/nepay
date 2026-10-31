@@ -1,11 +1,11 @@
 ---
-title: eSewa & Khalti Sandbox Test Credentials
-description: Official test credentials, customer test wallets, MPINs, and OTPs for testing eSewa UAT and Khalti sandbox payment flows.
+title: Payment Gateways Sandbox & Mock Testing Guide (eSewa, Khalti & Fonepay)
+description: Official test credentials, customer test wallets, MPINs, OTPs, and local mock testing for eSewa UAT, Khalti sandbox, and Fonepay flows.
 ---
 
 Testing digital payment gateways in Nepal requires testing against official staging and sandbox environments before applying for production merchant credentials.
 
-This guide provides official test credentials, wallet phone numbers, test OTPs, and instructions for running the test suite.
+This guide provides official test credentials, wallet phone numbers, test OTPs, local simulation options for Fonepay, and instructions for running the test suite.
 
 ---
 
@@ -58,6 +58,25 @@ Use these test wallets on the Khalti checkout screen:
 
 ---
 
+### Fonepay (Mock Sandbox & UAT Environment)
+
+#### The Fonepay Credential Reality
+Unlike eSewa or Khalti, **Fonepay does NOT provide an open self-service developer registration portal**. Test and production credentials for Fonepay require formal merchant onboarding through an acquiring commercial bank in Nepal (e.g., Nabil Bank, Global IME Bank, NIC Asia Bank, Himalayan Bank) or direct partner agreement with F1Soft / Fonepay.
+
+#### The `nepay` Built-In Mock Simulator
+To allow developers to build full checkout flows, UI modals, QR scanner integrations, and end-to-end payment state machines without waiting weeks for bank approvals, `nepay` includes a **zero-configuration developer mock simulator**:
+
+- **Merchant Code**: `"FONEPAYTEST"`
+- **Secret Key**: `"fonepay_secret_key"`
+- **Environment**: `isSandbox: true`
+
+When configured with `isSandbox: true` and `merchantCode: "FONEPAYTEST"`:
+1. **Dynamic QR Flow (`flow: "qr"`)**: `initiatePayment()` immediately generates a syntactically valid EMVCo dynamic QR code containing the requested amount and PRN (`000201010212...0406100.00...5802NP...`). You can render this directly as a QR code in your UI.
+2. **Hosted Web Flow (`flow: "hosted"`)**: Generates the exact signed redirect URL (`https://dev-clientapi.fonepay.com/api/merchantRequest?PID=...&MD=P&PRN=...&DV=...`) with HMAC-SHA512 verification digest.
+3. **When Real Credentials Arrive**: Simply replace `"FONEPAYTEST"` and `"fonepay_secret_key"` with your bank-issued production credentials. Zero code changes required.
+
+---
+
 ## 2. Setting Up Local Environment (`.env`)
 
 Configure your environment variables in your server root:
@@ -76,6 +95,12 @@ KHALTI_PUBLIC_KEY="your-khalti-sandbox-public-key"
 KHALTI_WEBSITE_URL="http://localhost:3000"
 KHALTI_RETURN_URL="http://localhost:3000/api/payment/callback/khalti"
 KHALTI_ENV="sandbox"
+
+# Fonepay Sandbox / Local Mock
+FONEPAY_MERCHANT_CODE="FONEPAYTEST"
+FONEPAY_SECRET_KEY="fonepay_secret_key"
+FONEPAY_RETURN_URL="http://localhost:3000/api/payment/callback/fonepay"
+FONEPAY_IS_SANDBOX="true"
 ```
 
 ---
@@ -85,14 +110,14 @@ KHALTI_ENV="sandbox"
 `nepay` comes with two test suites:
 
 ### Offline Unit Tests
-Tests schema validation, HMAC signature computation, comma formatting resilience, and error handling without making real network calls.
+Tests schema validation, HMAC signature computation, comma formatting resilience, Fonepay hosted/QR signing, and error handling without making real network calls:
 
 ```bash
 npm test
 ```
 
 ### Live Sandbox Gateway Tests
-Executes real HTTPS requests against official eSewa and Khalti sandbox servers:
+Executes real HTTPS requests against official eSewa, Khalti sandbox, and Fonepay gateway servers:
 
 ```bash
 npm run test:live
@@ -103,4 +128,7 @@ The live test suite verifies:
 2. **Khalti Lookup**: Calls `https://dev.khalti.com/api/v2/epayment/lookup/` with the generated `pidx` and asserts status is `"Initiated"` or `"Pending"`.
 3. **eSewa Signature**: Formats form parameters and calculates HMAC-SHA256 signatures according to ePay v2 requirements.
 4. **eSewa Status Query**: Invokes `https://rc.esewa.com.np/api/epay/transaction/status/` and validates gateway connectivity.
-5. **Amount Tampering Defense**: Asserts that `verifyPayment()` rejects transactions when the expected amount does not match the gateway record.
+5. **Fonepay Hosted Initiate**: Generates signed hosted URLs and verifies HMAC-SHA512 checksum integrity.
+6. **Fonepay Dynamic QR Mock Simulation**: Validates EMVCo QR code string generation with currency `524` (NPR) and formatted amount.
+7. **Fonepay Live Connectivity**: Verifies HTTPS connectivity to Fonepay gateway endpoints.
+8. **Amount Tampering Defense**: Asserts that `verifyPayment()` rejects transactions when the expected amount does not match the gateway record.

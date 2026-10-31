@@ -30,7 +30,7 @@ Only mark an order fulfilled when `result.status === "completed"`.
 
 ## Provider Verification Contracts
 
-The two gateways report verification issues differently. Knowing how each provider behaves helps you structure your error handling.
+The gateways report verification issues differently. Knowing how each provider behaves helps you structure your error handling.
 
 ### 1. eSewa (ePay v2)
 When `verifyPayment({ method: "esewa", ... })` is called:
@@ -59,6 +59,22 @@ When `verifyPayment({ method: "khalti", ... })` is called:
 **Exception behavior**:
 - `verifyPayment` **RETURNS** `{ status: "failed" }` on amount mismatch or order ID mismatch (instead of throwing).
 - It **throws only** on network transport errors or malformed non-JSON gateway responses.
+
+### 3. Fonepay (Dynamic QR & Hosted Web)
+When `verifyPayment({ method: "fonepay", ... })` is called:
+- **Hosted Flow (`flow: "hosted"`)**:
+  1. Validates the callback HMAC-SHA512 `DV` signature using `timingSafeEqual`.
+  2. Queries Fonepay's `verificationMerchant` S2S endpoint with `PID, PRN, BID, UID, AMT`.
+  3. Parses XML or JSON gateway responses to confirm `success: true` and `statusCode: 0`.
+  4. Confirms that the verified amount matches `expectedAmountPaisa`.
+- **Dynamic QR Flow (`flow: "qr"`)**:
+  1. Computes HMAC-SHA512 signature for `thirdPartyDynamicQrGetStatus`.
+  2. Queries Fonepay's QR status API.
+  3. Evaluates status code: `0` / `"SUCCESS"` $\rightarrow$ `{ status: "completed" }`; pending $\rightarrow$ `{ status: "pending" }`.
+
+**Exception behavior**:
+- `verifyPayment` **THROWS** on signature tampering or amount mismatch.
+- Returns normalized `PaymentResult` with `traceId` set to Fonepay's `UID` or settlement reference.
 
 ---
 

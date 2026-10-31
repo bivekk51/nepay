@@ -7,7 +7,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Nepay',
-			description: 'Developer-first unified Nepal payments SDK (eSewa + Khalti).',
+			description: 'Developer-first unified Nepal payments SDK (eSewa, Khalti & Fonepay).',
 			logo: {
 				dark: './src/assets/nepay-logo.svg',
 				light: './src/assets/nepay-logo-light.svg',
@@ -30,7 +30,7 @@ export default defineConfig({
 				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://nepay.nepalbivek.com.np/og-image.png' } },
 				{ tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'Nepay - Unified Nepal Payment Gateway SDK' } },
 				{ tag: 'meta', attrs: { name: 'theme-color', content: '#0a0a0c' } },
-				{ tag: 'meta', attrs: { name: 'keywords', content: 'esewa integration nodejs, khalti integration nodejs, nepal payment gateway, esewa epay v2 typescript, khalti epayment v2, esewa sandbox credentials, nextjs payment nepal, nepay' } },
+				{ tag: 'meta', attrs: { name: 'keywords', content: 'esewa integration nodejs, khalti integration nodejs, fonepay integration nodejs, fonepay dynamic qr, nepal payment gateway, esewa epay v2 typescript, khalti epayment v2, esewa sandbox credentials, nextjs payment nepal, nepay' } },
 				{ tag: 'meta', attrs: { name: 'google-site-verification', content: 'dYUwxTpYoS8yOT81kzgQ0awfEHl1pzv313zmCenKJMY' } },
 			],
 			customCss: ['./src/styles/custom.css'],
@@ -67,7 +67,7 @@ export default defineConfig({
 					items: [
 						{ label: 'eSewa (ePay v2)', slug: 'gateways/esewa' },
 						{ label: 'Khalti (ePayment v2)', slug: 'gateways/khalti' },
-						{ label: 'FonePay (Roadmap)', slug: 'gateways/fonepay' },
+						{ label: 'Fonepay (QR & Web)', slug: 'gateways/fonepay' },
 					],
 				},
 				{
