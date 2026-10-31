@@ -1,7 +1,7 @@
 {
   "name": "@bivekkk/nepay",
   "version": "0.1.2",
-  "description": "Developer-first unified Nepal payments SDK (eSewa + Khalti)",
+  "description": "Developer-first unified Nepal payments SDK (eSewa, Khalti, Fonepay)",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -24,6 +24,7 @@
     "payments",
     "esewa",
     "khalti",
+    "fonepay",
     "epay",
     "epayment",
     "nepal-payments",

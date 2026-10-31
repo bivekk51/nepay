@@ -12,6 +12,7 @@ import {
   verifyEsewaPayment,
   type KhaltiConfig,
   type EsewaConfig,
+  type FonepayConfig,
 } from "../src/index.js";
 
 // Load environment variables (Vitest automatically loads .env)
@@ -218,6 +219,82 @@ describe("Live Sandbox Integration Tests", { timeout: 20000 }, () => {
       expect(result.status).toBe("failed");
       expect(result.orderId).toBe(testOrderId);
       expect(result.amountPaisa).toBe(amountPaisa);
+    });
+  });
+
+  describe("Fonepay Integration End-to-End", () => {
+    const fonepayMerchantCode = process.env.FONEPAY_MERCHANT_CODE || "FONEPAYTEST";
+    const fonepaySecret = process.env.FONEPAY_SECRET_KEY || "test_secret_key_1234567890";
+    const isLiveCreds = Boolean(process.env.FONEPAY_MERCHANT_CODE && process.env.FONEPAY_SECRET_KEY);
+
+    const fonepayConfig: FonepayConfig = {
+      merchantCode: fonepayMerchantCode,
+      secretKey: fonepaySecret,
+      returnUrl: "https://example.com/payments/fonepay/callback",
+      isSandbox: !isLiveCreds,
+    };
+
+    const fpOrderId = `LIVE-FP-${Date.now()}`;
+    const fpAmountPaisa = 1000; // Rs 10
+
+    it("successfully generates signed Hosted Web Checkout URL via unified initiatePayment", async () => {
+      const res = await initiatePayment({
+        method: "fonepay",
+        config: fonepayConfig,
+        order: {
+          orderId: fpOrderId,
+          amountPaisa: fpAmountPaisa,
+          remarks1: "Fonepay Live Test",
+        },
+      });
+
+      expect("flow" in res && res.flow === "hosted").toBe(true);
+      if ("flow" in res && res.flow === "hosted") {
+        expect(res.payment_url).toContain("PRN=" + fpOrderId);
+        expect(res.payment_url).toContain("PID=" + fonepayConfig.merchantCode);
+        expect(res.payment_url).toContain("DV=");
+      }
+    });
+
+    it("successfully initiates Dynamic QR flow via unified initiatePayment", async () => {
+      const res = await initiatePayment({
+        method: "fonepay",
+        config: fonepayConfig,
+        flow: "qr",
+        order: {
+          orderId: fpOrderId,
+          amountPaisa: fpAmountPaisa,
+          remarks1: "Fonepay QR Test",
+        },
+      });
+
+      expect("flow" in res && res.flow === "qr").toBe(true);
+      if ("flow" in res && res.flow === "qr") {
+        expect(res.prn).toBe(fpOrderId);
+        expect(typeof res.qr_message).toBe("string");
+        expect(res.qr_message.length).toBeGreaterThan(20);
+      }
+    });
+
+    it("verifies Fonepay transaction through unified verifyPayment", async () => {
+      const result = await verifyPayment({
+        method: "fonepay",
+        config: fonepayConfig,
+        orderId: fpOrderId,
+        expectedAmountPaisa: fpAmountPaisa,
+        callbackData: {
+          prn: fpOrderId,
+          uid: `UID-${fpOrderId}`,
+          bid: "BID-TEST-001",
+          p_amt: "10.00",
+        },
+      });
+
+      if (!isLiveCreds) {
+        expect(result.status).toBe("completed");
+        expect(result.amountPaisa).toBe(fpAmountPaisa);
+        expect(result.orderId).toBe(fpOrderId);
+      }
     });
   });
 });

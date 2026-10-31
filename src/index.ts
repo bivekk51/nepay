@@ -13,6 +13,20 @@ import {
   verifyKhaltiPayment,
   getKhaltiCheckoutUrl,
 } from "./khalti.js";
+import {
+  FonepayConfigSchema,
+  FonepayFlowSchema,
+  initiateFonepay,
+  verifyFonepayPayment,
+  generateFonepayHostedUrl,
+  generateFonepayHostedSignature,
+  generateFonepayHostedVerifySignature,
+  generateFonepayQrSignature,
+  generateFonepayQrStatusSignature,
+  verifyFonepaySignature,
+  formatFonepayDate,
+  FONEPAY_BASES,
+} from "./fonepay.js";
 
 export type { PaymentStatus, PaymentResult } from "./types.js";
 export type {
@@ -34,6 +48,18 @@ export type {
   LookupKhaltiResult,
   VerifyKhaltiPaymentOpts,
 } from "./khalti.js";
+export type {
+  FonepayConfig,
+  FonepayFlow,
+  InitiateFonepayHostedOpts,
+  InitiateFonepayQrOpts,
+  InitiateFonepayOpts,
+  InitiateFonepayHostedResult,
+  InitiateFonepayQrResult,
+  InitiateFonepayResult,
+  VerifyFonepayPaymentOpts,
+} from "./fonepay.js";
+
 export { nprToPaisa, paisaToRupeesString, parseAmountToPaisa } from "./money.js";
 export {
   signEpayV2,
@@ -55,6 +81,21 @@ export {
   verifyKhaltiPayment,
   getKhaltiCheckoutUrl,
 } from "./khalti.js";
+export {
+  FonepayConfigSchema,
+  FonepayFlowSchema,
+  FONEPAY_BASES,
+  initiateFonepay,
+  verifyFonepayPayment,
+  generateFonepayHostedUrl,
+  generateFonepayHostedSignature,
+  generateFonepayHostedVerifySignature,
+  generateFonepayQrSignature,
+  generateFonepayQrStatusSignature,
+  verifyFonepaySignature,
+  formatFonepayDate,
+  fonepayPaisaToAmount,
+} from "./fonepay.js";
 
 export const EsewaInitiateSchema = z.object({
   method: z.literal("esewa"),
@@ -93,9 +134,24 @@ export const KhaltiInitiateSchema = z.object({
     }),
 });
 
+export const FonepayInitiateSchema = z.object({
+  method: z.literal("fonepay"),
+  config: FonepayConfigSchema,
+  flow: FonepayFlowSchema.optional(),
+  order: z.object({
+    orderId: z.string(),
+    amountPaisa: z.number().int(),
+    returnUrl: z.string().url().optional(),
+    remarks1: z.string().optional(),
+    remarks2: z.string().optional(),
+    date: z.union([z.date(), z.string()]).optional(),
+  }),
+});
+
 export const UnifiedInitiateInput = z.discriminatedUnion("method", [
   EsewaInitiateSchema,
   KhaltiInitiateSchema,
+  FonepayInitiateSchema,
 ]);
 export type UnifiedInitiateInput = z.infer<typeof UnifiedInitiateInput>;
 
@@ -115,9 +171,19 @@ export const KhaltiVerifySchema = z.object({
   expectedOrderId: z.string().optional(),
 });
 
+export const FonepayVerifySchema = z.object({
+  method: z.literal("fonepay"),
+  config: FonepayConfigSchema,
+  orderId: z.string(),
+  expectedAmountPaisa: z.number().int(),
+  flow: FonepayFlowSchema.optional(),
+  callbackData: z.record(z.unknown()).optional(),
+});
+
 export const UnifiedVerifyInput = z.discriminatedUnion("method", [
   EsewaVerifySchema,
   KhaltiVerifySchema,
+  FonepayVerifySchema,
 ]);
 export type UnifiedVerifyInput = z.infer<typeof UnifiedVerifyInput>;
 
@@ -125,7 +191,9 @@ export type UnifiedVerifyInput = z.infer<typeof UnifiedVerifyInput>;
 export const UnifiedInput = z.union([UnifiedInitiateInput, UnifiedVerifyInput]);
 
 export async function initiatePayment(input: UnifiedInitiateInput): Promise<
-  { url: string; fields: Record<string, string> } | import("./khalti.js").InitiateKhaltiResult
+  | { url: string; fields: Record<string, string> }
+  | import("./khalti.js").InitiateKhaltiResult
+  | import("./fonepay.js").InitiateFonepayResult
 > {
   const parsed = UnifiedInitiateInput.parse(input);
   switch (parsed.method) {
@@ -151,6 +219,17 @@ export async function initiatePayment(input: UnifiedInitiateInput): Promise<
         extra: parsed.order.extra as Record<`merchant_${string}`, string> | undefined,
       });
     }
+    case "fonepay":
+      return initiateFonepay({
+        config: parsed.config,
+        flow: parsed.flow,
+        orderId: parsed.order.orderId,
+        amountPaisa: parsed.order.amountPaisa,
+        returnUrl: parsed.order.returnUrl,
+        remarks1: parsed.order.remarks1,
+        remarks2: parsed.order.remarks2,
+        date: parsed.order.date,
+      });
   }
 }
 
@@ -170,6 +249,14 @@ export async function verifyPayment(input: UnifiedVerifyInput): Promise<PaymentR
         pidx: parsed.pidx,
         expectedAmountPaisa: parsed.expectedAmountPaisa,
         expectedOrderId: parsed.expectedOrderId,
+      });
+    case "fonepay":
+      return verifyFonepayPayment({
+        config: parsed.config,
+        orderId: parsed.orderId,
+        expectedAmountPaisa: parsed.expectedAmountPaisa,
+        flow: parsed.flow,
+        callbackData: parsed.callbackData,
       });
   }
 }

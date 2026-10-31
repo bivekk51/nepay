@@ -16,6 +16,15 @@ import type {
   LookupKhaltiOpts,
   LookupKhaltiResult,
   VerifyKhaltiPaymentOpts,
+  FonepayConfig,
+  FonepayFlow,
+  InitiateFonepayHostedOpts,
+  InitiateFonepayQrOpts,
+  InitiateFonepayOpts,
+  InitiateFonepayHostedResult,
+  InitiateFonepayQrResult,
+  InitiateFonepayResult,
+  VerifyFonepayPaymentOpts,
 } from "../src/index.js";
 
 describe("barrel type exports", () => {
@@ -70,6 +79,14 @@ describe("barrel type exports", () => {
     expect(barrel.KhaltiConfigSchema).toBeDefined();
     expect(barrel.KhaltiPaymentModeSchema).toBeDefined();
     expect(barrel.KhaltiCheckoutChannelSchema).toBeDefined();
+    expect(barrel.FonepayConfigSchema).toBeDefined();
+    expect(barrel.FonepayFlowSchema).toBeDefined();
+    expect(typeof barrel.initiateFonepay).toBe("function");
+    expect(typeof barrel.verifyFonepayPayment).toBe("function");
+    expect(typeof barrel.generateFonepayHostedUrl).toBe("function");
+    expect(typeof barrel.generateFonepayHostedSignature).toBe("function");
+    expect(typeof barrel.generateFonepayQrSignature).toBe("function");
+    expect(typeof barrel.formatFonepayDate).toBe("function");
     expect(typeof barrel.getKhaltiCheckoutUrl).toBe("function");
     expect(typeof barrel.initiatePayment).toBe("function");
     expect(typeof barrel.verifyPayment).toBe("function");
