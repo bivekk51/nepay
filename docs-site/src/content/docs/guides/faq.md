@@ -1,6 +1,6 @@
 ---
 title: Nepal Payment Gateway FAQ & Troubleshooting
-description: "Solutions to common eSewa ePay v2 and Khalti errors: PENDING callbacks, CORS issues, amount breakdown mismatches, and signature debugging."
+description: "Solutions to common eSewa ePay v2, Khalti, and Fonepay errors: PENDING callbacks, CORS issues, amount breakdown mismatches, and signature debugging."
 head:
   - tag: script
     attrs:

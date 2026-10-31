@@ -7,7 +7,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Nepay',
-			description: 'Developer-first unified Nepal payments SDK (eSewa, Khalti & Fonepay).',
+			description: 'Developer-first unified Nepal payments SDK for eSewa (ePay v2), Khalti (ePayment v2), and Fonepay (Hosted & Dynamic QR).',
 			logo: {
 				dark: './src/assets/nepay-logo.svg',
 				light: './src/assets/nepay-logo-light.svg',
