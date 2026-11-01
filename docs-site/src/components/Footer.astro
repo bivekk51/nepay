@@ -1,0 +1,216 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+---
+
+<Default {...Astro.props}><slot /></Default>
+
+<div class="nepay-footer-wrapper">
+  <div class="nepay-footer-card">
+    <div class="nepay-footer-main">
+      <div class="nepay-footer-brand">
+        <span class="nepay-footer-logo">nepay</span>
+        <span class="nepay-footer-badge">v0.2.0</span>
+        <span class="nepay-footer-dot">•</span>
+        <a href="https://github.com/bivekk51/nepay/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="nepay-footer-link">MIT License</a>
+      </div>
+      <p class="nepay-footer-desc">
+        Unified, typesafe TypeScript payment gateway SDK for Nepal (eSewa, Khalti &amp; Fonepay). Zero browser leaks, float-safe integer paisa math, and mandatory server-to-server verification.
+      </p>
+      <p class="nepay-footer-credits">
+        Crafted with care by <a href="https://nepalbivek.com.np/" target="_blank" rel="noopener noreferrer">Bivek Nepal</a>.
+      </p>
+    </div>
+
+    <div class="nepay-footer-action">
+      <div class="momo-support-card">
+        <div class="momo-support-text">
+          <span class="momo-support-title">Enjoying Nepay?</span>
+          <span class="momo-support-subtitle">Support open-source development</span>
+        </div>
+        <a
+          href="https://buymemomo.com/bivekk51"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="momo-footer-btn"
+        >
+          <span class="momo-emoji">🥟</span>
+          <span class="momo-btn-text">Buy me a momo</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .nepay-footer-wrapper {
+    margin-top: 2rem;
+    margin-bottom: 2.5rem;
+    width: 100%;
+  }
+
+  .nepay-footer-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.5rem;
+    background: var(--theme-surface-card, #0e0f14);
+    border: 1px solid var(--theme-surface-card-border, #1c1d22);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .nepay-footer-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .nepay-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .nepay-footer-logo {
+    font-family: var(--sl-font-system);
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.03em;
+    color: var(--sl-color-gray-1, #ffffff);
+  }
+
+  .nepay-footer-badge {
+    font-family: var(--sl-font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.15rem 0.45rem;
+    background: var(--sl-color-gray-6, #14151b);
+    border: 1px solid var(--sl-color-hairline, #22242b);
+    border-radius: 4px;
+    color: var(--sl-color-gray-3, #a1a1aa);
+  }
+
+  .nepay-footer-dot {
+    color: var(--sl-color-gray-4, #71717a);
+    font-size: 0.75rem;
+  }
+
+  .nepay-footer-link {
+    color: var(--sl-color-gray-3, #a1a1aa);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: color 0.15s ease;
+  }
+
+  .nepay-footer-link:hover {
+    color: var(--sl-color-gray-1, #ffffff);
+    text-decoration: underline;
+  }
+
+  .nepay-footer-desc {
+    font-size: 0.84rem;
+    color: var(--sl-color-gray-3, #a1a1aa);
+    line-height: 1.5;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .nepay-footer-credits {
+    font-size: 0.8rem;
+    color: var(--sl-color-gray-4, #71717a);
+    margin: 0;
+  }
+
+  .nepay-footer-credits a {
+    color: var(--sl-color-gray-2, #d4d4d8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  .nepay-footer-credits a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+
+  .nepay-footer-action {
+    flex-shrink: 0;
+  }
+
+  .momo-support-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.65rem;
+  }
+
+  .momo-support-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .momo-support-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--sl-color-gray-1, #ffffff);
+  }
+
+  .momo-support-subtitle {
+    font-size: 0.72rem;
+    color: var(--sl-color-gray-4, #71717a);
+  }
+
+  .momo-footer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: 999px;
+    background: #f97316;
+    color: #ffffff !important;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    line-height: 1.2;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.25);
+  }
+
+  .momo-footer-btn:hover {
+    background: #ea580c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+  }
+
+  .momo-emoji {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  @media (max-width: 720px) {
+    .nepay-footer-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    .nepay-footer-action {
+      width: 100%;
+    }
+
+    .momo-support-card {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .momo-support-text {
+      align-items: flex-start;
+      text-align: left;
+    }
+  }
+</style>

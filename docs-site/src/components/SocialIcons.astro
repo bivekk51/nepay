@@ -1,0 +1,59 @@
+---
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+---
+
+<Default><slot /></Default>
+
+<a
+  href="https://buymemomo.com/bivekk51"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="momo-nav-btn"
+  title="Support this project - Buy me a momo 🥟"
+>
+  <span class="momo-emoji">🥟</span>
+  <span class="momo-label">Buy me a momo</span>
+</a>
+
+<style>
+  .momo-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--sl-color-gray-2);
+    background: #14151b;
+    border: 1px solid #22242b;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    text-decoration: none !important;
+    line-height: 1.2;
+    transition: all 0.15s ease-in-out;
+    margin-inline-start: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .momo-nav-btn:hover {
+    color: #ffffff;
+    border-color: rgba(249, 115, 22, 0.45);
+    background: rgba(249, 115, 22, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+  }
+
+  .momo-emoji {
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
+  @media (max-width: 640px) {
+    .momo-label {
+      display: none;
+    }
+    .momo-nav-btn {
+      padding: 0.25rem 0.45rem;
+      margin-inline-start: 0.25rem;
+    }
+  }
+</style>
