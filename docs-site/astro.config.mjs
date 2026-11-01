@@ -38,6 +38,8 @@ export default defineConfig({
 				ThemeSelect: './src/components/ThemeSelect.astro',
 				Head: './src/components/Head.astro',
 				TableOfContents: './src/components/TableOfContents.astro',
+				SocialIcons: './src/components/SocialIcons.astro',
+				Footer: './src/components/Footer.astro',
 			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/bivekk51/nepay' }

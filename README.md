@@ -8,6 +8,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg" alt="Node.js Version"></a>
   <a href="tsconfig.json"><img src="https://img.shields.io/badge/TypeScript-5.x-blue.svg" alt="TypeScript"></a>
+  <a href="https://buymemomo.com/bivekk51"><img src="https://img.shields.io/badge/Buy%20me%20a-momo%20🥟-orange.svg" alt="Buy Me A Momo"></a>
 </p>
 
 # nepay
@@ -258,6 +259,14 @@ FONEPAY_IS_SANDBOX="true"
   npm run docs:dev    # Start local docs server at http://localhost:4321
   npm run docs:build  # Build production static documentation
   ```
+
+## Support 🥟
+
+If `nepay` makes your life easier or saves you hours of digging through fragmented payment gateway documentation, consider supporting open-source development by buying me a plate of momo!
+
+[![Buy me a momo](https://img.shields.io/badge/Buy%20me%20a-momo%20🥟-orange?style=for-the-badge)](https://buymemomo.com/bivekk51)
+
+👉 **[buymemomo.com/bivekk51](https://buymemomo.com/bivekk51)**
 
 ## Contributing
 
